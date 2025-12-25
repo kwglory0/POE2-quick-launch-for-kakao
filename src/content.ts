@@ -2,21 +2,24 @@
 const KEY_AUTO_START = 'autoStartEnabled';
 const KEY_CLOSE_TAB = 'closeTabEnabled';
 const KEY_CLOSE_POPUP = 'closePopupEnabled';
+const KEY_PLUGIN_DISABLED = 'pluginDisabled';
 
 interface PageSettings {
     isAutoStartEnabled: boolean;
     isCloseTabEnabled: boolean;
     isClosePopupEnabled: boolean;
+    isPluginDisabled: boolean;
 }
 
 console.log('POE2 Quick Launch Content Script Loaded');
 
 // Entry Point
-chrome.storage.local.get([KEY_AUTO_START, KEY_CLOSE_TAB, KEY_CLOSE_POPUP], (result) => {
+chrome.storage.local.get([KEY_AUTO_START, KEY_CLOSE_TAB, KEY_CLOSE_POPUP, KEY_PLUGIN_DISABLED], (result) => {
     const settings: PageSettings = {
         isAutoStartEnabled: result[KEY_AUTO_START] === true,
         isCloseTabEnabled: result[KEY_CLOSE_TAB] === true,
-        isClosePopupEnabled: result[KEY_CLOSE_POPUP] === true
+        isClosePopupEnabled: result[KEY_CLOSE_POPUP] === true,
+        isPluginDisabled: result[KEY_PLUGIN_DISABLED] === true
     };
 
     dispatchPageLogic(settings);
@@ -27,11 +30,12 @@ window.addEventListener('hashchange', () => {
     console.log('[Content] Hash changed:', window.location.hash);
     if (window.location.hash.includes('#autoStart')) {
         // Re-fetch settings to ensure we use the latest values (User might have toggled options)
-        chrome.storage.local.get([KEY_AUTO_START, KEY_CLOSE_TAB, KEY_CLOSE_POPUP], (result) => {
+        chrome.storage.local.get([KEY_AUTO_START, KEY_CLOSE_TAB, KEY_CLOSE_POPUP, KEY_PLUGIN_DISABLED], (result) => {
             const currentSettings: PageSettings = {
                 isAutoStartEnabled: result[KEY_AUTO_START] === true,
                 isCloseTabEnabled: result[KEY_CLOSE_TAB] === true,
-                isClosePopupEnabled: result[KEY_CLOSE_POPUP] === true
+                isClosePopupEnabled: result[KEY_CLOSE_POPUP] === true,
+                isPluginDisabled: result[KEY_PLUGIN_DISABLED] === true
             };
 
             // Only trigger if we are on the Main Page
@@ -47,6 +51,11 @@ window.addEventListener('hashchange', () => {
  * Dispatches logic based on the current URL.
  */
 function dispatchPageLogic(settings: PageSettings) {
+    if (settings.isPluginDisabled) {
+        console.log('Plugin is disabled by user setting. Skipping all logic.');
+        return;
+    }
+
     const path = window.location.pathname;
     const hostname = window.location.hostname;
 

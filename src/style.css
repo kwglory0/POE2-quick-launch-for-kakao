@@ -148,3 +148,32 @@ input:checked+.slider:before {
   color: #888;
   margin-top: 8px;
 }
+
+/* Feature: Plugin Disable Switch */
+.spacer-top {
+  margin-top: 10px;
+}
+
+/* Red Toggle for Disable Switch */
+input:checked+.slider.red {
+  background-color: #ff4444;
+  /* Red */
+}
+
+input:focus+.slider.red {
+  box-shadow: 0 0 1px #ff4444;
+}
+
+/* Grayscale/Disabled Effect */
+body.plugin-disabled .launch-button {
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+body.plugin-disabled .control-group:not(.always-active) {
+  opacity: 0.6;
+  pointer-events: none;
+  filter: grayscale(100%);
+}
