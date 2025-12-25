@@ -1,65 +1,83 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
   <title>POE2 빠른 실행 (Kakao)</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <script src="popup.js" defer></script>
 </head>
 
 <body>
   <div id="app">
-    <img src="assets/logo.webp" class="logo" alt="POE2 Logo" />
-    <img src="assets/logo-druids.png" class="logo-sub" alt="The Last of the Druids" />
+    <!-- Gothic Top Frame Decorations -->
+    <div class="frame-decoration top-left"></div>
+    <div class="frame-decoration top-right"></div>
+    <div class="frame-decoration top-center"></div>
 
-    <div class="action-section">
-      <a id="launchBtn" class="main-start__link" href="#">
-        <span class="hover-overlay"></span>
-        <span class="text-blind">POE2 게임 실행 (자동)</span>
-      </a>
-    </div>
+    <!-- Side Borders -->
+    <div class="frame-border border-left"></div>
+    <div class="frame-border border-right"></div>
 
-    <div class="control-group">
-      <label class="switch-container">
+    <!-- Main Content -->
+    <div class="content-wrapper">
+      <img src="assets/logo.webp" class="logo" alt="POE2 Logo" />
+      <img src="assets/logo-druids.png" class="logo-sub" alt="The Last of the Druids" />
+
+      <div class="action-section">
+        <a id="launchBtn" class="main-start__link" href="#">
+          <span class="hover-overlay"></span>
+          <span class="text-blind">게임 시작</span>
+        </a>
+      </div>
+
+      <div class="control-group">
         <span class="label-text">자동 실행 후 탭 닫기</span>
         <label class="switch">
-          <input type="checkbox" id="closeTabEnabled" />
+          <input type="checkbox" id="closeTabToggle" />
           <span class="slider round"></span>
         </label>
-      </label>
-    </div>
+      </div>
 
-    <div class="control-group">
-      <label class="switch-container">
+      <div class="control-group">
         <span class="label-text">항상 팝업 닫기</span>
         <label class="switch">
-          <input type="checkbox" id="autoClosePopup" />
+          <input type="checkbox" id="closePopupToggle" />
           <span class="slider round"></span>
         </label>
-      </label>
-    </div>
+      </div>
 
-    <div class="control-group always-active spacer-top">
-      <label class="switch-container">
+      <div class="control-group" id="pluginDisableGroup">
         <span class="label-text">플러그인 비활성화 (OFF)</span>
         <label class="switch">
-          <input type="checkbox" id="pluginDisabled" />
+          <input type="checkbox" id="pluginDisableToggle" />
           <span class="slider round red"></span>
         </label>
-      </label>
+      </div>
+
+      <div class="description spacer-top">
+        <p>
+          * 위 버튼을 누르거나, POE2 홈페이지 URL 뒤에
+          <code>#autoStart</code> 를 붙여 접속하면 자동 실행이 시작됩니다.
+        </p>
+      </div>
+
+      <!-- Footer Section -->
+
+      <!-- 1. Company Logos (Moved Above Banner) -->
+      <div class="company-logos">
+        <img src="assets/img-ci-kakaogames_158x28.png" class="ci-kakao" alt="Kakao Games" />
+        <span class="ci-divider"></span>
+        <img src="assets/img-ci-ggg_150x67.png" class="ci-ggg" alt="Grinding Gear Games" />
+      </div>
+
+      <!-- 2. Bottom Banner with Credits -->
+      <div class="credits-banner">
+        <span class="credits-text">Powered by NERDHEAD LAB</span>
+      </div>
+
     </div>
   </div>
-
-  <div class="description">
-    <p>* 위 버튼을 누르거나, POE2 홈페이지 URL 뒤에 <code>#autoStart</code>를 붙여 접속하면 자동 실행이 시작됩니다.</p>
-  </div>
-
-  <div class="footer">
-    POE2 빠른 실행 (Kakao)
-  </div>
-  </div>
-  <script type="module" src="popup.ts"></script>
 </body>
 
 </html>

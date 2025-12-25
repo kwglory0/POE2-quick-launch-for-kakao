@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
 
 body {
-  width: 320px;
+  width: 380px;
   font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-  padding: 16px;
+  padding: 0;
   background-color: #0c150c;
   background-image: url('assets/bg-forest.webp');
   background-size: cover;
@@ -12,19 +12,92 @@ body {
   color: #c8c8c8;
   margin: 0;
   overflow: hidden;
+  position: relative;
 }
 
 #app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* --- Gothic Frame Decorations --- */
+.frame-decoration {
+  position: absolute;
+  top: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.top-left {
+  left: 0;
+  width: 130px;
+  height: 130px;
+  background: url('assets/frame-top-left.webp') no-repeat;
+  background-size: contain;
+}
+
+.top-right {
+  right: 0;
+  width: 130px;
+  height: 130px;
+  background: url('assets/frame-top-right.webp') no-repeat;
+  background-size: contain;
+  background-position: top right;
+}
+
+.top-center {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  width: 260px;
+  height: 60px;
+  background: url('assets/frame-top-center.webp') no-repeat center top;
+  background-size: contain;
+}
+
+/* --- Side Borders --- */
+.frame-border {
+  position: absolute;
+  width: 100vh;
+  height: 14px;
+  z-index: 40;
+  background-image: url('assets/frame-tile.webp');
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  pointer-events: none;
+}
+
+.border-left {
+  top: 0;
+  left: 14px;
+  transform: rotate(90deg);
+  transform-origin: top left;
+}
+
+.border-right {
+  top: 0;
+  right: 14px;
+  transform: rotate(-90deg);
+  transform-origin: top right;
+}
+
+/* --- Content Wrapper --- */
+.content-wrapper {
+  padding: 32px 12px 0 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  position: relative;
+  z-index: 20;
 }
 
 /* Main Logo */
 .logo {
   display: block;
-  width: 150px;
-  margin: 0 auto;
+  width: 140px;
+  margin: -5px auto 0 auto;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
 }
@@ -32,25 +105,20 @@ body {
 /* Sub Logo (Season) */
 .logo-sub {
   display: block;
-  width: 270px;
-  /* Modified margins: 
-     -35px (was -45px) -> Pushes it down, creating more space from main logo.
-     2px (was 6px) -> Pulls button closer.
-  */
+  width: 250px;
   margin: -35px auto 2px auto;
   pointer-events: none;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
 }
 
 .action-section {
-  /* Added negative margin to pull button even closer as requested */
   margin-top: -4px;
   margin-bottom: 8px;
   position: relative;
   z-index: 10;
 }
 
-/* Game Start Button (Official Style) */
+/* Game Start Button */
 .main-start__link {
   display: block;
   width: 100%;
@@ -99,8 +167,8 @@ body {
 /* Controls Container */
 .control-group {
   background: rgba(10, 20, 15, 0.85);
-  padding: 12px 16px;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -115,20 +183,21 @@ body {
 }
 
 .label-text {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #e0e0e0;
   letter-spacing: -0.02em;
 }
 
 .description {
-  font-size: 12px;
+  font-size: 11px;
   color: #aaa;
   background: rgba(0, 0, 0, 0.6);
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 4px;
-  line-height: 1.5;
+  line-height: 1.4;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 0px;
 }
 
 .description p {
@@ -143,12 +212,12 @@ body {
   color: #9cdb43;
 }
 
-/* Switch Styling (Forest Theme) */
+/* Switch Styling */
 .switch {
   position: relative;
   display: inline-block;
-  width: 44px;
-  height: 24px;
+  width: 36px;
+  height: 20px;
 }
 
 .switch input {
@@ -166,17 +235,17 @@ body {
   bottom: 0;
   background-color: #444;
   transition: .3s;
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
   background-color: #d0d0d0;
   transition: .3s;
   border-radius: 50%;
@@ -189,14 +258,14 @@ input:checked+.slider {
 
 input:checked+.slider:before {
   background-color: #fff;
-  transform: translateX(20px);
+  transform: translateX(16px);
 }
 
 input:focus+.slider {
   box-shadow: 0 0 0 2px rgba(93, 174, 38, 0.3);
 }
 
-/* Red Toggle for Disable Switch */
+/* Red Toggle */
 .spacer-top {
   margin-top: 4px;
 }
@@ -209,15 +278,66 @@ input:focus+.slider.red {
   box-shadow: 0 0 0 2px rgba(185, 59, 59, 0.3);
 }
 
-.footer {
-  text-align: center;
-  font-size: 11px;
-  color: #8fa;
-  margin-top: 8px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+/* Footer Logos */
+.company-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0 8px 0;
+  margin: 0 -12px -24px -12px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 1) 90%);
+  position: relative;
+  z-index: 15;
+  border-top: none;
 }
 
-/* Grayscale/Disabled Effect */
+.ci-kakao {
+  height: 14px;
+  width: auto;
+  opacity: 0.8;
+}
+
+.ci-ggg {
+  height: 24px;
+  width: auto;
+  opacity: 0.8;
+}
+
+.ci-divider {
+  width: 1px;
+  height: 12px;
+  background-color: #666;
+}
+
+/* Credits Banner */
+.credits-banner {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 -12px;
+  height: 60px;
+  background-image: url('assets/banner-bottom.webp');
+  background-size: cover;
+  background-position: center;
+  /* Removed border-top preventing visual artifact */
+  border-top: none;
+}
+
+.credits-text {
+  font-family: 'Times New Roman', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #7a6e5d;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  margin-top: 32px;
+}
+
+/* Disabled State */
 body.plugin-disabled .main-start__link {
   filter: grayscale(100%) brightness(0.4);
   cursor: not-allowed;
