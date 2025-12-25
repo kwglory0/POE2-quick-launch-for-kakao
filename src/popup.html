@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 
 <head>
   <meta charset="UTF-8" />
@@ -11,7 +11,39 @@
 <body>
   <div id="app">
     <h1>POE2 빠른 실행 (Kakao)</h1>
-    <p>Kakao Games Launcher</p>
+
+    <div class="action-section">
+      <button id="launchBtn" class="launch-button">POE2 게임 실행 (자동)</button>
+    </div>
+
+    <div class="control-group">
+      <label class="switch-container">
+        <span class="label-text">자동 실행 후 탭 닫기</span>
+        <label class="switch">
+          <input type="checkbox" id="closeTabEnabled" />
+          <span class="slider round"></span>
+        </label>
+      </label>
+    </div>
+
+    <div class="control-group">
+      <label class="switch-container">
+        <span class="label-text">항상 팝업 닫기</span>
+        <label class="switch">
+          <input type="checkbox" id="autoClosePopup" />
+          <span class="slider round"></span>
+        </label>
+      </label>
+    </div>
+  </div>
+
+  <div class="description">
+    <p>* 위 버튼을 누르거나, POE2 홈페이지 URL 뒤에 <code>#autoStart</code>를 붙여 접속하면 자동 실행이 시작됩니다.</p>
+  </div>
+
+  <div class="footer">
+    Kakao Games Launcher
+  </div>
   </div>
   <script type="module" src="popup.ts"></script>
 </body>

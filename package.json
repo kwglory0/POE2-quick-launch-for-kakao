@@ -8,9 +8,9 @@
     "build": "tsc && vite build",
     "zip": "bestzip poe2-quick-launch-for-kakao.zip dist/"
   },
-  "dependencies": {},
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.28",
+    "@types/chrome": "^0.1.32",
     "bestzip": "^2.2.1",
     "typescript": "^5.2.2",
     "vite": "^5.0.0"
