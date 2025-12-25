@@ -212,7 +212,7 @@ function handleLauncherPage(settings: PageSettings) {
 function startPolling(settings: PageSettings) {
     let attempts = 0;
     let modalWaitCount = 0;
-    const maxAttempts = 15; // 15 seconds (approx)
+    const maxAttempts = 75; // 15 seconds (200ms * 75)
 
     const interval = setInterval(() => {
         // Safety: Pause if page lost focus
@@ -222,17 +222,19 @@ function startPolling(settings: PageSettings) {
         }
 
         // 1. Modal Blocker Check (with Timeout)
-        if (modalWaitCount < 3) {
+        // Wait up to approx 3 seconds (15 * 200ms = 3000ms)
+        if (modalWaitCount < 15) {
             const visibleModal = Array.from(document.querySelectorAll('.modal__container')).find(
                 el => (el as HTMLElement).offsetParent !== null
             );
 
             if (visibleModal) {
-                console.log(`Intro Modal detected. Waiting... (${modalWaitCount + 1}/3)`);
+                // Log less frequently to avoid spam? or just log
+                if (modalWaitCount % 5 === 0) console.log(`Intro Modal detected. Waiting... (${modalWaitCount + 1}/15)`);
                 modalWaitCount++;
                 return; // Skip this tick
             }
-        } else if (modalWaitCount === 3) {
+        } else if (modalWaitCount === 15) {
             console.log('Modal wait timeout exceeded. Bypassing check...');
             modalWaitCount++;
         }
@@ -263,14 +265,14 @@ function startPolling(settings: PageSettings) {
 
             return;
         } else {
-            console.log(`[Attempt ${attempts}] Start Button not found yet.`);
+            if (attempts % 5 === 0) console.log(`[Attempt ${attempts}] Start Button not found yet.`);
         }
 
         if (attempts >= maxAttempts) {
             clearInterval(interval);
             console.log('Stopped polling for Start Button.');
         }
-    }, 1000);
+    }, 200);
 }
 
 function manageIntroModal(preferTodayClose: boolean) {
@@ -289,34 +291,39 @@ function manageIntroModal(preferTodayClose: boolean) {
     }
 
     const dismissAttempt = () => {
-        // Broaden search: Any visible modal container
-        const containers = document.querySelectorAll('.modal__container');
-        if (containers.length === 0) return false;
+        // Strict Target based on User's HTML Snippet
+        const introContent = document.getElementById('kgIntroModalContents');
+        if (!introContent) {
+            // console.log('kgIntroModalContents not found');
+            return false;
+        }
 
-        for (const container of containers) {
-            // Check visibility (heuristic)
-            if ((container as HTMLElement).offsetParent === null) continue;
+        const container = introContent.closest('.modal__container');
+        if (!container) return false;
 
-            // Strategy A: "Today Close" Logic (Priority)
-            if (preferTodayClose) {
-                const todayBtn = container.querySelector('.modal__button-block');
-                if (todayBtn) {
-                    console.log('Found "Today Close" button (.modal__button-block). Clicking...');
-                    safeClick(todayBtn as HTMLElement);
-                    return true;
-                } else {
-                    console.log('"Today Close" preferred but button not found. Falling back to X button...');
-                }
-            }
+        // Check visibility (heuristic)
+        if ((container as HTMLElement).offsetParent === null) return false;
 
-            // Strategy B: Click "X" (Fallback or Default)
-            const closeBtn = container.querySelector('.modal__button-x');
-            if (closeBtn) {
-                console.log('Found "Close" button (.modal__button-x). Clicking...');
-                safeClick(closeBtn as HTMLElement);
+        // Strategy A: "Today Close" Logic (Priority)
+        if (preferTodayClose) {
+            const todayBtn = container.querySelector('.modal__button-block');
+            if (todayBtn) {
+                console.log('Found "Today Close" button (.modal__button-block) inside target container. Clicking...');
+                safeClick(todayBtn as HTMLElement);
                 return true;
+            } else {
+                console.log('"Today Close" preferred but .modal__button-block not found in target container. Falling back to X...');
             }
         }
+
+        // Strategy B: Click "X" (Fallback or Default)
+        const closeBtn = container.querySelector('.modal__button-x');
+        if (closeBtn) {
+            console.log('Found "Close" button (.modal__button-x) inside target container. Clicking...');
+            safeClick(closeBtn as HTMLElement);
+            return true;
+        }
+
         return false;
     };
 
@@ -326,7 +333,7 @@ function manageIntroModal(preferTodayClose: boolean) {
         if (dismissAttempt()) {
             clearInterval(interval);
         }
-    }, 500);
+    }, 200);
 
     setTimeout(() => clearInterval(interval), 10000);
 }
