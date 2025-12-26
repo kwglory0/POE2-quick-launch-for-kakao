@@ -2,7 +2,14 @@
 console.log('!!! Background Service Worker Initialized !!!');
 
 // Allow Content Scripts to access chrome.storage.session
-chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS' });
+// Allow Content Scripts to access chrome.storage.session
+if (chrome.storage.session && chrome.storage.session.setAccessLevel) {
+    try {
+        chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS' });
+    } catch (error) {
+        console.warn('Failed to set access level for session storage:', error);
+    }
+}
 
 interface MessageRequest {
     action: string;

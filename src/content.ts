@@ -92,7 +92,7 @@ function handleMainPage(settings: PageSettings) {
 function handleSecurityCenterPage(_settings: PageSettings) {
     console.log('Page Type: SECURITY_CENTER');
 
-    const observer = new MutationObserver((_mutations, obs) => {
+    const checkAndClick = (obs?: MutationObserver) => {
         const buttons = Array.from(document.querySelectorAll(SELECTORS.SECURITY.CONFIRM_BUTTONS.join(', ')));
 
         // Priority 0: Designated PC "Confirm" Button
@@ -100,8 +100,8 @@ function handleSecurityCenterPage(_settings: PageSettings) {
         if (designPcBtn) {
             console.log('Found Designated PC Confirm button. Clicking...');
             safeClick(designPcBtn as HTMLElement);
-            obs.disconnect();
-            return;
+            if (obs) obs.disconnect();
+            return true;
         }
 
         // Priority 1: Generic Confirm (Fallback)
@@ -112,17 +112,24 @@ function handleSecurityCenterPage(_settings: PageSettings) {
         if (confirmBtn) {
             console.log('Found Generic Confirm button. Clicking...');
             safeClick(confirmBtn as HTMLElement);
-            obs.disconnect();
+            if (obs) obs.disconnect();
+            return true;
         }
-    });
+        return false;
+    };
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    if (!checkAndClick()) {
+        const observer = new MutationObserver((_mutations, obs) => {
+            checkAndClick(obs);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 }
 
 function handleLauncherPage(settings: PageSettings) {
     console.log('Page Type: LAUNCHER / PUBSVC');
 
-    const observer = new MutationObserver((_mutations, obs) => {
+    const checkAndClick = (obs?: MutationObserver) => {
         // Construct query string from array
         const query = SELECTORS.LAUNCHER.GAME_START_BUTTONS.join(', ');
         const buttons = Array.from(document.querySelectorAll(query + ', .popup__link--confirm'));
@@ -137,9 +144,10 @@ function handleLauncherPage(settings: PageSettings) {
             if (confirmBtn) {
                 console.log('Found "Confirm" button for Login Popup. Clicking...');
                 safeClick(confirmBtn as HTMLElement);
-                obs.disconnect();
+                if (obs) obs.disconnect();
+                return true;
             }
-            return;
+            return false;
         }
 
         // 2. Check for "Game Start" Button
@@ -165,11 +173,20 @@ function handleLauncherPage(settings: PageSettings) {
                     console.log('Signal sent successfully.');
                 }
             });
-            obs.disconnect();
+            if (obs) obs.disconnect();
+            return true;
         }
-    });
+        return false;
+    };
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Attempt immediately
+    if (!checkAndClick()) {
+        console.log('Loop not found immediately. Starting observer...');
+        const observer = new MutationObserver((_mutations, obs) => {
+            checkAndClick(obs);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 }
 
 function startPolling(settings: PageSettings) {

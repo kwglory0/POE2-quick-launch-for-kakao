@@ -684,7 +684,15 @@ body.plugin-disabled .control-group:not(.always-active) {
 
   transition: opacity 0.2s ease;
   width: max-content;
-  max-width: 320px;
+  max-width: 300px;
+  /* Constrain popup width */
+}
+
+.tooltip-popup img {
+  display: block;
+  width: 280px;
+  /* Explicit image width */
+  height: auto;
 }
 
 .tooltip-wrapper:hover .tooltip-popup {

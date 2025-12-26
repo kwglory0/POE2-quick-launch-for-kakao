@@ -92,12 +92,12 @@ launchBtn.addEventListener('click', (e) => {
         if (tab && tab.id) {
             // Logic handled by content scripts
         }
-    });
 
-    // Handle "Close Popup" immediately if requested
-    if (isClosePopupFn) {
-        window.close();
-    }
+        // Handle "Close Popup" only after tab creation is initiated
+        if (isClosePopupFn) {
+            window.close();
+        }
+    });
 });
 
 // Load Settings on Startup
