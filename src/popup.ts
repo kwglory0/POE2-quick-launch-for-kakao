@@ -5,26 +5,47 @@ const closeTabToggle = document.getElementById('closeTabToggle') as HTMLInputEle
 const closePopupToggle = document.getElementById('closePopupToggle') as HTMLInputElement;
 const pluginDisableToggle = document.getElementById('pluginDisableToggle') as HTMLInputElement;
 const launchBtn = document.getElementById('launchBtn') as HTMLAnchorElement;
+// Stacked Drawer Elements
 const settingsToggle = document.getElementById('settingsToggle') as HTMLElement;
 const settingsContent = document.getElementById('settingsContent') as HTMLElement;
+const patchNotesToggle = document.getElementById('patchNotesToggle') as HTMLElement;
+const patchNotesContent = document.getElementById('patchNotesContent') as HTMLElement;
 
-// Load saved settings
-chrome.storage.local.get(['closeTab', 'closePopup', 'isPluginDisabled'], (result) => {
-    closeTabToggle.checked = result.closeTab !== false; // Default true
-    closePopupToggle.checked = result.closePopup !== false; // Default true
+// Mutual Exclusion Drawer Logic
+function toggleDrawerStack(target: 'settings' | 'patchNotes') {
+    const isSettingsTarget = target === 'settings';
 
-    // Plugin Disable State
-    const isPluginDisabled = result.isPluginDisabled === true;
-    pluginDisableToggle.checked = isPluginDisabled;
-    updatePluginDisabledState(isPluginDisabled);
-});
+    if (isSettingsTarget) {
+        // Toggle Settings
+        const willOpen = !settingsContent.classList.contains('open');
+        settingsContent.classList.toggle('open', willOpen);
+        settingsToggle.classList.toggle('active', willOpen);
 
-// Settings Toggle Logic
-if (settingsToggle && settingsContent) {
-    settingsToggle.addEventListener('click', () => {
-        const isOpen = settingsContent.classList.toggle('open');
-        settingsToggle.classList.toggle('active', isOpen);
-    });
+        // Close Patch Notes
+        if (willOpen) {
+            patchNotesContent.classList.remove('open');
+            patchNotesToggle.classList.remove('active');
+        }
+    } else {
+        // Toggle Patch Notes
+        const willOpen = !patchNotesContent.classList.contains('open');
+        patchNotesContent.classList.toggle('open', willOpen);
+        patchNotesToggle.classList.toggle('active', willOpen);
+
+        // Close Settings
+        if (willOpen) {
+            settingsContent.classList.remove('open');
+            settingsToggle.classList.remove('active');
+        }
+    }
+}
+
+if (settingsToggle) {
+    settingsToggle.addEventListener('click', () => toggleDrawerStack('settings'));
+}
+
+if (patchNotesToggle) {
+    patchNotesToggle.addEventListener('click', () => toggleDrawerStack('patchNotes'));
 }
 
 // Save settings on change

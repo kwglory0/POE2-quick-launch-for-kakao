@@ -16,43 +16,230 @@ body {
   position: relative;
 }
 
+/* --- 3-Section Flex Layout (Main - Menu - Footer) --- */
+
 #app {
-  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-/* --- Content Wrapper --- */
 .content-wrapper {
   padding: 32px 12px 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  position: relative;
-  z-index: 20;
   height: 100%;
+  box-sizing: border-box;
+  gap: 0;
+  /* Reset gap, control via margin/padding */
 }
 
-/* Logos */
+/* 1. Main Section (Top) */
+.main-section {
+  flex: 0 0 auto;
+  /* Natural height */
+  margin-bottom: 0;
+  z-index: 20;
+}
+
+.action-section {
+  margin-top: -4px;
+  margin-bottom: 8px;
+  /* Gap between buttons and menu */
+  position: relative;
+  z-index: 10;
+}
+
+/* 2. Menu Section (Middle - Fills remaining space) */
+.drawer-container {
+  flex: 1 1 auto;
+  /* Grow to fill space */
+  display: flex;
+  flex-direction: column-reverse;
+  /* Stack from bottom */
+  min-height: 0;
+  /* Crucial for scrolling inside flex Item */
+  margin-bottom: 0;
+
+  overflow: hidden;
+  /* Clip overflow */
+  position: relative;
+  /* Context */
+  z-index: 50;
+}
+
+/* Harmonized drawer transitions */
+.drawer-block {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 100%;
+  /* Use simple ease-in-out for balanced swap */
+  transition: flex 0.4s ease-in-out;
+  /* Ensure clipping happens during animation */
+  overflow: hidden;
+}
+
+/* When content is open, this block expands to fill empty space */
+.drawer-block:has(.open) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Content Panel (Relative Flow) */
+.drawer-content {
+  position: relative;
+  width: 100%;
+  background: rgba(10, 14, 10, 0.95);
+  box-sizing: border-box;
+  /* Crucial: Include padding and border in width to prevent clipping */
+
+  /* Instantly collapse when closed */
+  max-height: 0;
+
+  opacity: 0;
+  /* Only animate opacity. Let Parent Flex handle the reveal. */
+  transition: opacity 0.4s ease-in-out;
+
+  box-shadow: none;
+}
+
+.drawer-content.open {
+  flex: 1 1 auto;
+  /* Fill parent block */
+  max-height: 1000px;
+  /* Huge limit to allow scrolling, instant application */
+  opacity: 1;
+  overflow-y: auto;
+  /* Scroll if content exceeds space */
+  border-bottom: 1px solid rgba(223, 207, 153, 0.1);
+}
+
+/* 3. Footer Section (Bottom) */
+.footer-section {
+  flex: 0 0 auto;
+  /* Natural height */
+  position: relative;
+  z-index: 60;
+  background: #0c150c;
+  /* Opaque bg to hide content behind */
+  padding-bottom: 0;
+  /* Visual separation */
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Reset Description Styles */
+.description.top-guide {
+  margin: 0;
+  width: 100%;
+  position: relative;
+  /* Flow naturally */
+  bottom: auto;
+  left: auto;
+  right: auto;
+  padding: 4px 12px;
+  /* Reduced vertical padding */
+  text-align: center;
+  background: none;
+  /* Using footer bg */
+  border: none;
+}
+
+.description.top-guide p {
+  color: #889988;
+  font-size: 11px;
+}
+
+/* Reset Company Logos */
+.company-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 0;
+  /* Remove padding entirely */
+  position: relative;
+  bottom: auto;
+  left: auto;
+  background: none;
+
+  /* Overlap Logic */
+  z-index: 30;
+  /* Sit above banner (z-20) */
+  margin-bottom: -24px;
+  /* Pull banner up to overlap */
+}
+
+/* Reset Credits Banner */
+.credits-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  position: relative;
+  bottom: auto;
+  left: auto;
+  background-image: url('assets/banner-bottom.webp');
+  background-size: cover;
+  background-position: center;
+  z-index: 20;
+  /* Below Logos */
+}
+
+.credits-text {
+  margin-top: 28px;
+  /* Text stays low */
+  font-size: 9px;
+  color: #555;
+  text-shadow: none;
+}
+
+/* Horizontal Logo Layout */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Center vertically */
+  gap: 4px;
+  /* Slight gap */
+  margin-bottom: 4px;
+  /* Minimal bottom margin */
+  width: 100%;
+}
+
+/* Logos - Maximize size for horizontal fit */
 .logo {
   display: block;
-  width: 140px;
-  margin: -5px auto 0 auto;
+  height: 90px;
+  /* Increased from 60px */
+  width: auto;
+  max-width: 45%;
+  /* Prevent overthrow */
+  object-fit: contain;
+  margin: 0;
   pointer-events: none;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
 }
 
 .logo-sub {
   display: block;
-  width: 250px;
-  margin: -35px auto 2px auto;
+  height: 85px;
+  /* Increased from 55px */
+  width: auto;
+  max-width: 55%;
+  /* Allow Druids to be wider */
+  object-fit: contain;
+  margin: 0;
   pointer-events: none;
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+  position: relative;
+  left: -5px;
 }
 
 .action-section {
-  margin-top: -4px;
+  margin-top: 0;
+  /* Remove negative margin as logos are now compact */
   margin-bottom: 8px;
   position: relative;
   z-index: 10;
@@ -170,127 +357,134 @@ body {
   text-shadow: 0 0 5px rgba(223, 207, 153, 0.5);
 }
 
-/* --- Settings Menu (Drawer Style) --- */
+/* --- Legacy Layout Removed (Replaced by Flex System at Top) --- */
 
-/* Header: The Handle */
-.settings-header {
-  position: absolute;
-  /* Start Position (Closed) */
-  bottom: 135px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  z-index: 70;
-  /* Highest z-index to sit on top of everything */
-
+.drawer-block {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 12px;
-  cursor: pointer;
-  color: #dfcf99;
-  font-size: 14px;
-  font-weight: 500;
-
-  /* Animate 'bottom' property */
-  transition: bottom 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  user-select: none;
-  opacity: 0.8;
-  width: max-content;
+  flex-direction: column;
+  /* Inside value: Handle Top, Content Bottom */
+  width: 100%;
+  pointer-events: auto;
+  /* Re-enable for visible blocks */
+  flex-shrink: 0;
 }
 
-.settings-header:hover {
-  opacity: 1;
+/* Handle Styling */
+.drawer-handle {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  background: rgba(14, 18, 14, 0.95);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(223, 207, 153, 0.1);
+  border-top: 1px solid rgba(223, 207, 153, 0.3);
+  /* Each handle has top border */
+
+  color: #dfcf99;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.drawer-handle:hover {
+  background: rgba(30, 35, 30, 0.95);
+  color: #fff;
   text-shadow: 0 0 5px rgba(223, 207, 153, 0.4);
 }
 
-.settings-header.active {
-  /* Move UP when active */
-  bottom: 265px;
+.drawer-handle.active {
+  background: #1a221a;
   color: #fff;
   text-shadow: 0 0 8px rgba(223, 207, 153, 0.6);
-}
-
-.icon-settings {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
+  border-left: 3px solid #dfcf99;
+  padding-left: 13px;
 }
 
 .arrow-indicator {
   font-size: 10px;
-  margin-top: 2px;
-  transition: transform 0.2s;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.settings-header.active .arrow-indicator {
+/* Arrow Logic: Content below. Open = Point Up (Collapse)? or Down?
+   User said "Like picture". Picture 3 has Down arrows.
+   Let's use: Closed = Down (▼), Open = Up (▲). */
+.drawer-handle.active .arrow-indicator {
   transform: rotate(180deg);
 }
 
-/* Settings Content: The Drawer */
+/* --- Legacy Duplicates Removed --- */
+
+/* Specific Content Internal Padding */
+.patch-notes-content {
+  padding: 0;
+}
+
+.patch-notes-content.open {
+  padding: 12px 20px 12px 14px;
+}
+
 .settings-content {
-  position: absolute;
-  /* Fixed Anchor at bottom of drawer area */
-  bottom: 135px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-
-  /* Widen to 340px */
-  width: 340px;
-  z-index: 60;
-  /* Above frames */
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  /* Animation State */
-  height: 0;
-  /* Grow height */
-  opacity: 0;
-  overflow-y: hidden;
-  overflow-x: hidden;
-
-  transition:
-    height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 0.2s ease;
-
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 4px;
-  border: 1px solid rgba(223, 207, 153, 0.2);
-  /* Hide border when closed to avoid thin line */
-  border-color: transparent;
+  padding: 0;
 }
 
 .settings-content.open {
-  height: 125px;
-  /* Fill space */
-  opacity: 1;
-  overflow-y: auto;
-  padding: 4px;
-  border-color: rgba(223, 207, 153, 0.2);
+  padding: 12px 20px 8px 4px;
 }
 
-/* Thin Scrollbar Styling */
-.settings-content::-webkit-scrollbar {
-  width: 6px;
+/* Scrollbars */
+.drawer-content::-webkit-scrollbar {
+  width: 4px;
 }
 
-.settings-content::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  margin: 4px 0;
+.drawer-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-.settings-content::-webkit-scrollbar-thumb {
+.drawer-content::-webkit-scrollbar-thumb {
   background: #7a6e5d;
-  border-radius: 3px;
 }
 
-.settings-content::-webkit-scrollbar-thumb:hover {
-  background: #dfcf99;
+/* Typography reuse */
+.patch-notes-content h3 {
+  margin: 10px 0 6px 0;
+  font-size: 12px;
+  color: #dfcf99;
+  border-bottom: 1px solid rgba(223, 207, 153, 0.2);
+  padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.patch-notes-content h3:first-child {
+  margin-top: 0;
+}
+
+.version-badge {
+  background: #2e3a2e;
+  color: #90d090;
+  font-size: 10px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid #4a6a4a;
+}
+
+.patch-notes-content ul {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 12px;
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.patch-notes-content li {
+  margin-bottom: 2px;
 }
 
 /* Controls */
@@ -326,11 +520,9 @@ body {
   line-height: 1.4;
   border: 1px solid rgba(255, 255, 255, 0.05);
 
-  position: absolute;
-  bottom: 85px;
-  left: 12px;
+  /* Removed absolute positioning to allow flow at the top */
   width: calc(100% - 24px);
-  margin: 0;
+  margin: 0 auto;
   box-sizing: border-box;
   text-align: center;
   z-index: 25;
@@ -413,66 +605,7 @@ input:focus+.slider.red {
   box-shadow: 0 0 0 2px rgba(185, 59, 59, 0.3);
 }
 
-/* Footer Logos */
-.company-logos {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  padding: 40px 0 10px 0;
-  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 1) 90%);
-  position: absolute;
-  bottom: 25px;
-  left: 0;
-  width: 100%;
-  z-index: 15;
-}
-
-.ci-kakao {
-  height: 14px;
-  width: auto;
-  opacity: 0.8;
-}
-
-.ci-ggg {
-  height: 24px;
-  width: auto;
-  opacity: 0.8;
-}
-
-.ci-divider {
-  width: 1px;
-  height: 12px;
-  background-color: #666;
-}
-
-/* Credits Banner */
-.credits-banner {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  z-index: 20;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-image: url('assets/banner-bottom.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-.credits-text {
-  font-family: 'Times New Roman', serif;
-  font-size: 10px;
-  letter-spacing: 1px;
-  color: #7a6e5d;
-  text-transform: uppercase;
-  font-weight: 700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  margin-top: 32px;
-}
+/* --- Legacy Footer Removed --- */
 
 body.plugin-disabled .main-start__link {
   filter: grayscale(100%) brightness(0.4);
@@ -552,9 +685,60 @@ body.plugin-disabled .control-group:not(.always-active) {
   /* Fixed position handles translation */
 }
 
-.tooltip-popup img {
-  display: block;
-  max-width: 250px;
-  height: auto;
-  border-radius: 2px;
+/* Restore Logo Sizes */
+.ci-kakao {
+  height: 14px;
+  width: auto;
+  opacity: 0.8;
+}
+
+.ci-ggg {
+  height: 24px;
+  width: auto;
+  opacity: 0.8;
+}
+
+.ci-divider {
+  width: 1px;
+  height: 12px;
+  background-color: #666;
+}
+
+/* Credits Banner Text */
+.credits-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 48px;
+  /* Adjusted for better spacing */
+  background-image: url('assets/banner-bottom.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin-top: 0;
+}
+
+.credits-text {
+  font-family: 'Times New Roman', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #7a6e5d;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  margin-top: 28px;
+  /* Per user request: Push text down lower */
+}
+
+/* Fix disabled state targeting */
+body.plugin-disabled .main-start__link {
+  filter: grayscale(100%) brightness(0.4);
+  cursor: not-allowed;
+}
+
+body.plugin-disabled .control-group:not(.always-active) {
+  opacity: 0.4;
+  pointer-events: none;
+  filter: grayscale(100%);
 }
