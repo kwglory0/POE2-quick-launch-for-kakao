@@ -6,7 +6,7 @@ body {
   font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   padding: 0;
   background-color: #0c150c;
-  background-image: url('assets/bg-forest.webp');
+  background-image: url('assets/poe2/bg-forest.webp');
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
@@ -207,14 +207,8 @@ body {
   /* Minimal bottom margin */
   width: 100%;
 
-  /* Link Styles */
+  /* Link Styles Removed */
   text-decoration: none;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.logo-container:hover {
-  opacity: 0.9;
 }
 
 /* Logos - Maximize size for horizontal fit */
