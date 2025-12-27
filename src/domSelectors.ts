@@ -68,5 +68,12 @@ export const SELECTORS = {
 
         // Generic popup confirm button
         BTN_POPUP_CONFIRM: '.popup__link--confirm'
+    },
+
+    // -------------------------------------------------------------------------
+    // 4. POE Main Page (poe.game.daum.net)
+    // -------------------------------------------------------------------------
+    POE: {
+        BTN_GAME_START: '#signupButton'
     }
 };

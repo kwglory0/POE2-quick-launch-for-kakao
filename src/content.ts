@@ -13,7 +13,7 @@ interface PageSettings {
     isPluginDisabled: boolean;
 }
 
-console.log('POE2 Quick Launch Content Script Loaded');
+console.log('POE / POE2 Quick Launch Content Script Loaded');
 
 // Entry Point
 chrome.storage.local.get([KEY_AUTO_START, KEY_CLOSE_TAB, KEY_CLOSE_POPUP, KEY_PLUGIN_DISABLED], (result) => {
@@ -41,7 +41,7 @@ window.addEventListener('hashchange', () => {
 
             if (window.location.pathname.includes('/main')) {
                 console.log('[Content] #autoStart detected via Hash Change. Re-triggering logic with fresh settings.');
-                handleMainPage(currentSettings);
+                handlePoe2Page(currentSettings);
             }
         });
     }
@@ -58,8 +58,11 @@ function dispatchPageLogic(settings: PageSettings) {
 
     console.log('Dispatching logic for:', window.location.href);
 
-    if (path.includes('/main')) {
-        handleMainPage(settings);
+    if (hostname.includes('poe.game.daum.net')) {
+        handlePoePage(settings);
+    }
+    else if (hostname.includes('pathofexile2.game.daum.net') && path.includes('/main')) {
+        handlePoe2Page(settings);
     }
     else if (hostname.includes('security-center')) {
         handleSecurityCenterPage(settings);
@@ -72,8 +75,34 @@ function dispatchPageLogic(settings: PageSettings) {
     }
 }
 
-function handleMainPage(settings: PageSettings) {
-    console.log('Page Type: MAIN');
+function handlePoePage(settings: PageSettings) {
+    console.log('Page Type: POE MAIN');
+
+    if (window.location.hash.includes('#autoStart')) {
+        console.log('Auto Start triggered on POE.');
+
+        const pollForButton = setInterval(() => {
+            const startBtn = document.querySelector(SELECTORS.POE.BTN_GAME_START) as HTMLElement;
+            if (startBtn) {
+                console.log('Found POE Start Button, clicking...');
+                safeClick(startBtn);
+                clearInterval(pollForButton);
+
+                // Send signal to potentially close tab if configured (reuse launcher signal)
+                chrome.runtime.sendMessage({
+                    action: 'launcherGameStartClicked',
+                    shouldCloseMainPage: settings.isCloseTabEnabled
+                });
+            }
+        }, 500);
+
+        // Timeout after 10 seconds
+        setTimeout(() => clearInterval(pollForButton), 10000);
+    }
+}
+
+function handlePoe2Page(settings: PageSettings) {
+    console.log('Page Type: POE2 MAIN');
 
     const shouldDismissToday = settings.isClosePopupEnabled;
     const isAutoStart = window.location.hash.includes('#autoStart');
