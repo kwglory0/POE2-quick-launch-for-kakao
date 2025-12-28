@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/compare/1.0.0...1.0.1) (2025-12-28)
+
+
+### Bug Fixes
+
+* 플러그인 이름 및 릴리즈 규칙 수정 ([cd0ab38](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/commit/cd0ab383cb5690724c38860a2ffde680a11d51ed))
+
 ## [1.0.0](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/compare/1.0.0...1.0.0) (2025-12-28)
 
 

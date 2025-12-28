@@ -1,7 +1,7 @@
 {
   "name": "poe-poe2-quick-launch-for-kakao",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Kakao Games Path of Exile (1 & 2) Quick Launch Extension",
   "author": "NERDHEAD LAB",

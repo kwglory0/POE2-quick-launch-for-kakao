@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "POE & POE2 빠른 실행 (Kakao)",
     "description": "Kakao Games POE 및 POE2 홈페이지 접속 시 게임 자동 실행 및 편의 기능 제공",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "action": {
         "default_popup": "src/popup.html",
         "default_icon": {
