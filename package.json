@@ -3,6 +3,26 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Kakao Games Path of Exile (1 & 2) Quick Launch Extension",
+  "author": "NERDHEAD LAB",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/issues"
+  },
+  "homepage": "https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao#readme",
+  "keywords": [
+    "poe",
+    "poe2",
+    "path of exile",
+    "kakao games",
+    "launcher",
+    "extension",
+    "chrome-extension"
+  ],
   "engines": {
     "node": ">=22"
   },

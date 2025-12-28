@@ -1,6 +1,30 @@
 # POE2 Quick Launch for Kakao
 
-![DOWNLOAD@SNAPSHOT](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/1.0.0-SNAPSHOT/total?style=for-the-badge&color=success&label=DOWNLOAD@SNAPSHOT)
+<!-- prettier-ignore-start -->
+![Total Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/total?style=for-the-badge&color=success)
+![Latest Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/latest/total?style=for-the-badge&color=success)
+
+| GitHub Release                                                 | Build Status                                             | License                                                        | Sponsors                                                          | Buy Me a Coffee                                                   |
+|----------------------------------------------------------------|----------------------------------------------------------|----------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------|
+| [![GitHub release][github-release-badge]][github-release-link] | [![Build Status][build-status-badge]][build-status-link] | [![GitHub license][github-license-badge]][github-license-link] | [![GitHub sponsors][github-sponsors-badge]][github-sponsors-link] | [![Buy Me a Coffee][buy-me-a-coffee-badge]][buy-me-a-coffee-link] |
+
+<!-- prettier-ignore-end -->
+
+<!-- Badges -->
+
+[github-release-badge]: https://img.shields.io/github/v/release/NERDHEAD-lab/POE2-quick-launch-for-kakao?logo=github
+[build-status-badge]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions/workflows/release-please.yml/badge.svg
+[github-license-badge]: https://img.shields.io/github/license/NERDHEAD-lab/POE2-quick-launch-for-kakao
+[github-sponsors-badge]: https://img.shields.io/github/sponsors/NERDHEAD-lab?logo=github&logoColor=white
+[buy-me-a-coffee-badge]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-yellow?logo=buymeacoffee&logoColor=white
+
+<!-- Links -->
+
+[github-release-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/releases
+[build-status-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions
+[github-license-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/blob/master/LICENSE
+[github-sponsors-link]: https://github.com/sponsors/NERDHEAD-lab
+[buy-me-a-coffee-link]: https://coff.ee/nerdhead_lab
 
 ![Demo](docs/demo_preview.gif)
 
@@ -55,6 +79,12 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
     - 좌측 상단 **"압축해제된 확장 프로그램을 로드합니다"** 클릭
     - 프로젝트 폴더 내의 `dist` 폴더 선택
 
+## 지원 및 문의
+
+- [자주 묻는 질문 (FAQ)](docs/FAQ.md)
+- [버그 제보 및 개선 요청 (Github)](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/issues)
+- [오픈 카카오톡](https://open.kakao.com/o/sK3FU2Fh)
+
 ## 기술 스택
 
 - **Framework**: React, Vite
@@ -63,4 +93,4 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
 
 ## 라이선스
 
-[MIT](LICENSE)
+[MIT](LICENSE) | [개인정보 처리방침 (Privacy Policy)](docs/PRIVACY_POLICY.md)
