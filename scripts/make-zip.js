@@ -8,19 +8,20 @@ const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
 
 const version = packageJson.version;
+const packageName = packageJson.name;
 
 // 0. Cleanup existing zip files
 const dir = process.cwd();
 fs.readdirSync(dir).forEach(file => {
-    // Clean up both old timestamp format and new version format
-    if ((file.startsWith('poe2-quick-launch-for-kakao-') && file.endsWith('.zip'))) {
+    // Clean up typical zip patterns
+    if (file.startsWith(packageName) && file.endsWith('.zip')) {
         console.log(`Removing old zip: ${file}`);
         fs.unlinkSync(path.join(dir, file));
     }
 });
 
-// Filename format: poe2-quick-launch-for-kakao-v1.0.0.zip
-const fileName = `poe2-quick-launch-for-kakao-v${version}.zip`;
+// Filename format: {package-name}-v{version}.zip
+const fileName = `${packageName}-v${version}.zip`;
 
 console.log(`Creating zip file: ${fileName}`);
 
