@@ -1,5 +1,3 @@
-# POE2 Quick Launch for Kakao
-
 <!-- prettier-ignore-start -->
 ![Total Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/total?style=for-the-badge&color=success)
 ![Latest Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/latest/total?style=for-the-badge&color=success)
@@ -26,9 +24,9 @@
 [github-sponsors-link]: https://github.com/sponsors/NERDHEAD-lab
 [buy-me-a-coffee-link]: https://coff.ee/nerdhead_lab
 
-![Demo](docs/demo_preview.gif)
 
-> **[Demo]**: 여기에 추가할 데모 이미지(gif)를 `docs/demo_preview.gif` 경로에 추가해주세요.
+# POE2 Quick Launch for Kakao
+![Demo](docs/poe2_autoStart_test_preview.gif)
 
 Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하는 크롬 확장 프로그램입니다.
 번거로운 홈페이지 접속, 게임 시작 버튼 찾기, 모달 닫기 과정을 자동으로 처리하여 빠르게 게임에 진입할 수 있도록 돕습니다.
