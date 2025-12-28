@@ -340,14 +340,12 @@ function updatePluginDisabledState(isDisabled: boolean) {
         document.body.classList.add('plugin-disabled');
         launchBtn.style.pointerEvents = 'none';
         launchBtn.removeAttribute('href');
-        if (btnHomepage) btnHomepage.style.pointerEvents = 'none';
-        if (btnTrade) btnTrade.style.pointerEvents = 'none';
+        // Homepage & Trade links should remain active
     } else {
         document.body.classList.remove('plugin-disabled');
         launchBtn.style.pointerEvents = 'auto';
         launchBtn.href = '#';
-        if (btnHomepage) btnHomepage.style.pointerEvents = 'auto';
-        if (btnTrade) btnTrade.style.pointerEvents = 'auto';
+        // Homepage & Trade links remain active
     }
 }
 
