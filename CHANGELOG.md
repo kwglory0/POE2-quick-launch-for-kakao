@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/compare/1.0.1...1.1.0) (2025-12-29)
+
+
+### Features
+
+* popup에서 poe와 poe2 전환 간 패치노트 표시 성능 개선 및 최적화 ([671e8c5](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/commit/671e8c5dfcd4675fab8095cdb5cc8c11ef5769ee))
+* popup의 공지 표시 기능 개선 및 설정에서 숨기기 옵션 추가 ([fbb2b76](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/commit/fbb2b768b797e28658198da3db2193a4164e98d9))
+* poup에서 poe/poe2 배경화면에 따른 동적 테마 색상 적용 성능 최적화 ([ccb8257](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/commit/ccb82579e5cc4204554c31a157ea05712b4b67a6))
+
+
+### Bug Fixes
+
+* 설정 명칭 구체화 ('항상 팝업 닫기' -&gt; '홈페이지 이벤트 창 자동 닫기' 등) ([8013793](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/commit/8013793a6ad5a9981c521f3fb46423735abb78c6))
+
 ## [1.0.1](https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/compare/1.0.0...1.0.1) (2025-12-28)
 
 
