@@ -45,10 +45,7 @@
             </a>
           </div>
 
-          <a id="fixGuideBtn" class="sub-link" href="https://gall.dcinside.com/poe2/293273" target="_blank">
-            <span class="hover-overlay"></span>
-            <span class="btn-text">Transferred a partial file 조치 방법</span>
-          </a>
+          <div id="noticeContainer" class="notice-list"></div>
         </div>
       </div>
 
@@ -71,7 +68,23 @@
 
             <div class="control-group">
               <div class="label-container">
-                <span class="label-text">항상 팝업 닫기</span>
+                <span class="label-text">플러그인 공지사항 표시</span>
+                <div class="tooltip-wrapper">
+                  <span class="info-icon">i</span>
+                  <div class="tooltip-popup">
+                    <img src="assets/notice-info.png" alt="Notice Info" />
+                  </div>
+                </div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="showNoticesToggle" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <div class="label-container">
+                <span class="label-text">홈페이지 이벤트 창 자동 닫기</span>
                 <div class="tooltip-wrapper">
                   <span class="info-icon">i</span>
                   <div class="tooltip-popup">
@@ -108,9 +121,8 @@
             <span class="arrow-indicator">▼</span>
           </div>
           <div id="patchNotesContent" class="drawer-content patch-notes-content open">
-            <ul id="patchNoteList" class="patch-note-list">
-              <!-- Dynamic Content -->
-            </ul>
+            <ul id="patchNoteList-poe" class="patch-note-list" style="display: none;"></ul>
+            <ul id="patchNoteList-poe2" class="patch-note-list" style="display: none;"></ul>
             <a id="patchNoteMoreBtn" href="#" target="_blank" class="patch-note-more">더보기</a>
           </div>
         </div>

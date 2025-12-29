@@ -1,18 +1,21 @@
 // popup.ts
-import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS } from './storage';
+import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS, Notice, ThemeColors } from './storage';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
+import { fetchNotices } from './notice';
 
 // Type assertions for stronger typing
 const closeTabToggle = document.getElementById('closeTabToggle') as HTMLInputElement;
 const closePopupToggle = document.getElementById('closePopupToggle') as HTMLInputElement;
+const showNoticesToggle = document.getElementById('showNoticesToggle') as HTMLInputElement;
 const pluginDisableToggle = document.getElementById('pluginDisableToggle') as HTMLInputElement;
 const launchBtn = document.getElementById('launchBtn') as HTMLAnchorElement;
-const fixGuideBtn = document.getElementById('fixGuideBtn') as HTMLAnchorElement;
+const noticeContainer = document.getElementById('noticeContainer') as HTMLDivElement;
 const btnHomepage = document.getElementById('btnHomepage') as HTMLAnchorElement;
 const btnTrade = document.getElementById('btnTrade') as HTMLAnchorElement;
 
 // Patch Note Elements
-const patchNoteList = document.getElementById('patchNoteList') as HTMLUListElement;
+const patchNoteListPoe = document.getElementById('patchNoteList-poe') as HTMLUListElement;
+const patchNoteListPoe2 = document.getElementById('patchNoteList-poe2') as HTMLUListElement;
 const patchNoteMoreBtn = document.getElementById('patchNoteMoreBtn') as HTMLAnchorElement;
 const patchNoteCountInput = document.getElementById('patchNoteCountInput') as HTMLInputElement;
 
@@ -29,6 +32,8 @@ const patchNotesContent = document.getElementById('patchNotesContent') as HTMLEl
 let selectedGame: GameType = 'poe2'; // Default local state, will be updated from storage
 let patchNoteCount = 3;
 let cachedPatchNotes: Record<GameType, PatchNote[]> = { poe: [], poe2: [] };
+let cachedNotices: Notice[] = [];
+let cachedThemeColors: Record<string, ThemeColors> = {};
 
 import bgPoe from './assets/poe/bg-keepers.png';
 import bgPoe2 from './assets/poe2/bg-forest.webp';
@@ -41,7 +46,6 @@ const GAME_CONFIG = {
         url: 'https://poe.game.daum.net#autoStart',
         homepageUrl: 'https://poe.game.daum.net/',
         tradeUrl: 'https://poe.game.daum.net/trade',
-        showFixGuide: false,
         fallback: {
             text: '#c8c8c8',
             accent: '#dfcf99', // Gold
@@ -54,7 +58,6 @@ const GAME_CONFIG = {
         url: 'https://pathofexile2.game.daum.net/main#autoStart',
         homepageUrl: 'https://pathofexile2.game.daum.net/main',
         tradeUrl: 'https://poe.game.daum.net/trade2',
-        showFixGuide: true,
         fallback: {
             text: '#b5c2b5',
             accent: '#aaddaa', // Mint
@@ -132,6 +135,12 @@ async function extractThemeColors(imageUrl: string, fallback: { text: string, ac
     });
 }
 
+function applyThemeColors(colors: ThemeColors) {
+    document.body.style.setProperty('--theme-text', colors.text);
+    document.body.style.setProperty('--theme-accent', colors.accent);
+    document.body.style.setProperty('--theme-footer-bg', colors.footer);
+}
+
 function updateMoreButton(game: GameType) {
     if (patchNoteMoreBtn) {
         const apiGame = game === 'poe' ? 'poe1' : 'poe2';
@@ -139,13 +148,39 @@ function updateMoreButton(game: GameType) {
     }
 }
 
-function renderPatchNotes(notes: PatchNote[]) {
-    if (!patchNoteList) return;
+function renderNotices(notices: Notice[], game: GameType) {
+    if (!noticeContainer) return;
+    noticeContainer.innerHTML = '';
 
-    patchNoteList.innerHTML = '';
+    const currentNotices = notices.filter(n => n.targetGame.includes(game));
+
+    currentNotices.forEach(notice => {
+        const a = document.createElement('a');
+        a.className = 'sub-link';
+        a.href = notice.link;
+        a.target = '_blank';
+
+        const hoverOverlay = document.createElement('span');
+        hoverOverlay.className = 'hover-overlay';
+
+        const btnText = document.createElement('span');
+        btnText.className = 'btn-text';
+        btnText.textContent = notice.title;
+
+        a.appendChild(hoverOverlay);
+        a.appendChild(btnText);
+        noticeContainer.appendChild(a);
+    });
+}
+
+function renderPatchNotes(notes: PatchNote[], game: GameType) {
+    const listElement = game === 'poe' ? patchNoteListPoe : patchNoteListPoe2;
+    if (!listElement) return;
+
+    listElement.innerHTML = '';
 
     if (notes.length === 0) {
-        patchNoteList.innerHTML = '<li class="empty">패치노트가 없습니다.</li>';
+        listElement.innerHTML = '<li class="empty">패치노트가 없습니다.</li>';
         return;
     }
 
@@ -173,55 +208,49 @@ function renderPatchNotes(notes: PatchNote[]) {
 
         li.appendChild(a);
         li.appendChild(dateSpan);
-        patchNoteList.appendChild(li);
+        listElement.appendChild(li);
     });
 }
 
-async function updatePatchNotes(game: GameType) {
-    if (!patchNoteList) return;
+function updatePatchNotes(game: GameType) {
+    const listElement = game === 'poe' ? patchNoteListPoe : patchNoteListPoe2;
+    if (!listElement) return;
 
     updateMoreButton(game);
 
     // 1. Initial Render from Cache
     const initialNotes = cachedPatchNotes[game] || [];
     if (initialNotes.length > 0) {
-        renderPatchNotes(initialNotes.slice(0, patchNoteCount));
+        renderPatchNotes(initialNotes.slice(0, patchNoteCount), game);
     } else {
-        patchNoteList.innerHTML = '<li class="loading">로딩중...</li>';
+        listElement.innerHTML = '<li class="loading">로딩중...</li>';
     }
 
-    // 2. Fetch Fresh Data
+    // 2. Fetch Fresh Data (Background)
     const apiGame = game === 'poe' ? 'poe1' : 'poe2';
-    const fetchedNotes = await fetchPatchNotes(apiGame, patchNoteCount);
 
-    // 3. Diff and Merge Logic
-    // "New" = Item in fetched list BUT NOT in cached list (by link)
-    // We want to preserve "isNew" status of cached items?
-    // User request: "When overwriting, affix N to non-duplicated posts"
-    // Interpretation: 
-    // - Load previously cached list (Old Cache)
-    // - Fetch new list (New Fetch)
-    // - For each item in New Fetch:
-    //   - If it exists in Old Cache, it is NOT new (isNew = false).
-    //   - If it does NOT exist in Old Cache, it IS new (isNew = true).
+    fetchPatchNotes(apiGame, patchNoteCount).then(fetchedNotes => {
+        // 3. Diff and Merge Logic
+        const processedNotes: PatchNote[] = fetchedNotes.map(newNote => {
+            const existsInCache = initialNotes.some(cached => cached.link === newNote.link);
+            return {
+                ...newNote,
+                isNew: !existsInCache // Marked New if not found in previous cache
+            };
+        });
 
-    const processedNotes: PatchNote[] = fetchedNotes.map(newNote => {
-        const existsInCache = initialNotes.some(cached => cached.link === newNote.link);
-        return {
-            ...newNote,
-            isNew: !existsInCache // Marked New if not found in previous cache
-        };
+        // 4. Update Cache & Render
+        if (processedNotes.length > 0) {
+            // Simple equality check to avoid unnecessary re-renders
+            if (JSON.stringify(processedNotes) !== JSON.stringify(initialNotes)) {
+                cachedPatchNotes[game] = processedNotes;
+                saveSetting(STORAGE_KEYS.CACHED_PATCH_NOTES, cachedPatchNotes);
+                renderPatchNotes(processedNotes, game);
+            }
+        } else if (initialNotes.length === 0) {
+            listElement.innerHTML = '<li class="empty">패치노트를 불러오지 못했습니다.</li>';
+        }
     });
-
-    // 4. Update Cache & Render
-    // Only update and re-render if there's actual data
-    if (processedNotes.length > 0) {
-        cachedPatchNotes[game] = processedNotes;
-        saveSetting(STORAGE_KEYS.CACHED_PATCH_NOTES, cachedPatchNotes);
-        renderPatchNotes(processedNotes);
-    } else if (initialNotes.length === 0) {
-        patchNoteList.innerHTML = '<li class="empty">패치노트를 불러오지 못했습니다.</li>';
-    }
 }
 
 async function updateGameUI(game: GameType) {
@@ -232,16 +261,27 @@ async function updateGameUI(game: GameType) {
     document.body.classList.remove('bg-poe', 'bg-poe2');
     document.body.classList.add(config.bgClass);
 
-    try {
-        const colors = await extractThemeColors(config.bgImage, config.fallback);
-        document.body.style.setProperty('--theme-text', colors.text);
-        document.body.style.setProperty('--theme-accent', colors.accent);
-        document.body.style.setProperty('--theme-footer-bg', colors.footer);
-    } catch (e) {
-        document.body.style.setProperty('--theme-text', config.fallback.text);
-        document.body.style.setProperty('--theme-accent', config.fallback.accent);
-        document.body.style.setProperty('--theme-footer-bg', config.fallback.footer);
+    // Theme Colors (SWR)
+    const cached = cachedThemeColors[config.bgImage];
+    if (cached) {
+        applyThemeColors(cached);
     }
+
+    // Always fetch/re-calculate in background to handle updates
+    extractThemeColors(config.bgImage, config.fallback).then(newColors => {
+        // Compare new vs cached to decide if update needed
+        // Simple JSON stringify comparison
+        if (!cached || JSON.stringify(newColors) !== JSON.stringify(cached)) {
+            applyThemeColors(newColors);
+            cachedThemeColors[config.bgImage] = newColors;
+            saveSetting(STORAGE_KEYS.CACHED_THEME_COLORS, cachedThemeColors);
+        }
+    }).catch(() => {
+        // Only apply fallback if no cache existed
+        if (!cached) {
+            applyThemeColors(config.fallback);
+        }
+    });
 
     // Logos
     if (game === 'poe') {
@@ -257,11 +297,34 @@ async function updateGameUI(game: GameType) {
     if (btnHomepage) btnHomepage.href = config.homepageUrl;
     if (btnTrade) btnTrade.href = config.tradeUrl;
 
-    if (config.showFixGuide) {
-        fixGuideBtn.style.display = 'flex';
-    } else {
-        fixGuideBtn.style.display = 'none';
+    if (btnTrade) btnTrade.href = config.tradeUrl;
+
+    // Patch List Visibility
+    if (patchNoteListPoe && patchNoteListPoe2) {
+        if (game === 'poe') {
+            patchNoteListPoe.style.display = 'block';
+            patchNoteListPoe2.style.display = 'none';
+        } else {
+            patchNoteListPoe.style.display = 'none';
+            patchNoteListPoe2.style.display = 'block';
+        }
     }
+
+    // Notices (Stale-While-Revalidate)
+    // 1. Render Cached
+    renderNotices(cachedNotices, game);
+
+    // 2. Fetch & Update if changed
+    fetchNotices().then(newNotices => {
+        // Simple equality check by stringify
+        const isChanged = JSON.stringify(newNotices) !== JSON.stringify(cachedNotices);
+
+        if (isChanged && newNotices.length > 0) {
+            cachedNotices = newNotices;
+            saveSetting(STORAGE_KEYS.CACHED_NOTICES, newNotices);
+            renderNotices(newNotices, game);
+        }
+    });
 
     // Update Patch Notes
     updatePatchNotes(game);
@@ -318,6 +381,14 @@ closePopupToggle.addEventListener('change', () => {
     saveSetting(STORAGE_KEYS.CLOSE_POPUP, closePopupToggle.checked);
 });
 
+showNoticesToggle.addEventListener('change', () => {
+    const isShown = showNoticesToggle.checked;
+    saveSetting(STORAGE_KEYS.SHOW_NOTICES, isShown);
+    if (noticeContainer) {
+        noticeContainer.style.display = isShown ? 'flex' : 'none';
+    }
+});
+
 pluginDisableToggle.addEventListener('change', () => {
     const isDisabled = pluginDisableToggle.checked;
     saveSetting(STORAGE_KEYS.PLUGIN_DISABLED, isDisabled);
@@ -366,6 +437,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     closeTabToggle.checked = settings.closeTab;
     closePopupToggle.checked = settings.closePopup;
+    showNoticesToggle.checked = settings.showNotices;
+
+    // Apply visibility immediately
+    if (noticeContainer) {
+        noticeContainer.style.display = settings.showNotices ? 'flex' : 'none';
+    }
 
     const isDisabled = settings.pluginDisable;
     pluginDisableToggle.checked = isDisabled;
@@ -374,6 +451,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     patchNoteCount = settings.patchNoteCount;
     patchNoteCountInput.value = patchNoteCount.toString();
     cachedPatchNotes = settings.cachedPatchNotes || DEFAULT_SETTINGS.cachedPatchNotes; // Load cache
+    cachedNotices = settings.cachedNotices || DEFAULT_SETTINGS.cachedNotices;
+    cachedThemeColors = settings.cachedThemeColors || DEFAULT_SETTINGS.cachedThemeColors;
 
     updateGameUI(settings.selectedGame);
 });

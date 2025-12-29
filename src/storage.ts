@@ -7,12 +7,27 @@ export interface PatchNote {
     isNew?: boolean;
 }
 
+export interface Notice {
+    title: string;
+    link: string;
+    targetGame: GameType[];
+}
+
+export interface ThemeColors {
+    text: string;
+    accent: string;
+    footer: string;
+}
+
 export interface AppSettings {
     closeTab: boolean;
     closePopup: boolean;
     pluginDisable: boolean;
     patchNoteCount: number; // 1~20
     cachedPatchNotes: Record<GameType, PatchNote[]>;
+    cachedNotices: Notice[];
+    cachedThemeColors: Record<string, ThemeColors>;
+    showNotices: boolean;
     selectedGame: GameType;
 }
 
@@ -22,7 +37,10 @@ export const STORAGE_KEYS = {
     PLUGIN_DISABLED: 'pluginDisable',
     SELECTED_GAME: 'selectedGame',
     PATCH_NOTE_COUNT: 'patchNoteCount',
-    CACHED_PATCH_NOTES: 'cachedPatchNotes'
+    CACHED_PATCH_NOTES: 'cachedPatchNotes',
+    CACHED_NOTICES: 'cachedNotices',
+    CACHED_THEME_COLORS: 'cachedThemeColors',
+    SHOW_NOTICES: 'showNotices'
 } as const;
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -31,6 +49,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     pluginDisable: false,
     patchNoteCount: 3,
     cachedPatchNotes: { poe: [], poe2: [] },
+    cachedNotices: [],
+    cachedThemeColors: {},
+    showNotices: true,
     selectedGame: 'poe2'
 };
 
@@ -46,6 +67,9 @@ export async function loadSettings(): Promise<AppSettings> {
                 pluginDisable: (result[STORAGE_KEYS.PLUGIN_DISABLED] as boolean) ?? DEFAULT_SETTINGS.pluginDisable,
                 patchNoteCount: (result[STORAGE_KEYS.PATCH_NOTE_COUNT] as number) ?? DEFAULT_SETTINGS.patchNoteCount,
                 cachedPatchNotes: (result[STORAGE_KEYS.CACHED_PATCH_NOTES] as Record<GameType, PatchNote[]>) ?? DEFAULT_SETTINGS.cachedPatchNotes,
+                cachedNotices: (result[STORAGE_KEYS.CACHED_NOTICES] as Notice[]) ?? DEFAULT_SETTINGS.cachedNotices,
+                cachedThemeColors: (result[STORAGE_KEYS.CACHED_THEME_COLORS] as Record<string, ThemeColors>) ?? DEFAULT_SETTINGS.cachedThemeColors,
+                showNotices: (result[STORAGE_KEYS.SHOW_NOTICES] as boolean) ?? DEFAULT_SETTINGS.showNotices,
                 selectedGame: (result[STORAGE_KEYS.SELECTED_GAME] as GameType) ?? DEFAULT_SETTINGS.selectedGame
             };
             resolve(settings);
