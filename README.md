@@ -1,6 +1,6 @@
 <!-- prettier-ignore-start -->
-![Total Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/total?style=for-the-badge&color=success)
-![Latest Downloads](https://img.shields.io/github/downloads/NERDHEAD-lab/POE2-quick-launch-for-kakao/latest/total?style=for-the-badge&color=success)
+[![Chrome Web Store][chrome-web-store-version-badge]][chrome-web-store-link]
+[![Chrome Web Store Users][chrome-web-store-users-badge]][chrome-web-store-link]
 
 | GitHub Release                                                 | Build Status                                             | License                                                        | Sponsors                                                          | Buy Me a Coffee                                                   |
 |----------------------------------------------------------------|----------------------------------------------------------|----------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------|
@@ -9,7 +9,8 @@
 <!-- prettier-ignore-end -->
 
 <!-- Badges -->
-
+[chrome-web-store-version-badge]: https://img.shields.io/chrome-web-store/v/cpghdafmhbkggpehfhcdicaoponodbje?label=Chrome%20Web%20Store&logo=chromewebstore&style=for-the-badge&color=success
+[chrome-web-store-users-badge]: https://img.shields.io/chrome-web-store/users/cpghdafmhbkggpehfhcdicaoponodbje?logo=chromewebstore&style=for-the-badge&color=success
 [github-release-badge]: https://img.shields.io/github/v/release/NERDHEAD-lab/POE2-quick-launch-for-kakao?logo=github
 [build-status-badge]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions/workflows/release-please.yml/badge.svg
 [github-license-badge]: https://img.shields.io/github/license/NERDHEAD-lab/POE2-quick-launch-for-kakao
@@ -17,7 +18,7 @@
 [buy-me-a-coffee-badge]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-yellow?logo=buymeacoffee&logoColor=white
 
 <!-- Links -->
-
+[chrome-web-store-link]: https://chrome.google.com/webstore/detail/poe2-trade-butler/ipnemofnhodcgcplnnfekbfpmngeeocm
 [github-release-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/releases
 [build-status-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions
 [github-license-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/blob/master/LICENSE
@@ -38,12 +39,6 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
 - **스마트 탭 관리**: 게임 실행 후 자동으로 홈페이지 탭을 닫거나 정리 (설정 가능)
 - **보안 센터 자동 패스**: "지정 PC 등록" 등 보안 확인 버튼 자동 감지 및 클릭
 - **플러그인 제어**: 필요에 따라 플러그인 기능 일시 정지/재개
-
-## 다운로드
-
-> 🚧 **Chrome Web Store 출시 예정**
->
-> 현재 마켓 심사 준비 중입니다. 개발용으로 직접 빌드하여 사용할 수 있습니다.
 
 ## 개발 및 설치 가이드
 
