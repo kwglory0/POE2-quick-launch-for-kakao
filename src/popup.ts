@@ -14,7 +14,8 @@ const btnHomepage = document.getElementById('btnHomepage') as HTMLAnchorElement;
 const btnTrade = document.getElementById('btnTrade') as HTMLAnchorElement;
 
 // Patch Note Elements
-const patchNoteList = document.getElementById('patchNoteList') as HTMLUListElement;
+const patchNoteListPoe = document.getElementById('patchNoteList-poe') as HTMLUListElement;
+const patchNoteListPoe2 = document.getElementById('patchNoteList-poe2') as HTMLUListElement;
 const patchNoteMoreBtn = document.getElementById('patchNoteMoreBtn') as HTMLAnchorElement;
 const patchNoteCountInput = document.getElementById('patchNoteCountInput') as HTMLInputElement;
 
@@ -172,13 +173,14 @@ function renderNotices(notices: Notice[], game: GameType) {
     });
 }
 
-function renderPatchNotes(notes: PatchNote[]) {
-    if (!patchNoteList) return;
+function renderPatchNotes(notes: PatchNote[], game: GameType) {
+    const listElement = game === 'poe' ? patchNoteListPoe : patchNoteListPoe2;
+    if (!listElement) return;
 
-    patchNoteList.innerHTML = '';
+    listElement.innerHTML = '';
 
     if (notes.length === 0) {
-        patchNoteList.innerHTML = '<li class="empty">패치노트가 없습니다.</li>';
+        listElement.innerHTML = '<li class="empty">패치노트가 없습니다.</li>';
         return;
     }
 
@@ -206,55 +208,49 @@ function renderPatchNotes(notes: PatchNote[]) {
 
         li.appendChild(a);
         li.appendChild(dateSpan);
-        patchNoteList.appendChild(li);
+        listElement.appendChild(li);
     });
 }
 
-async function updatePatchNotes(game: GameType) {
-    if (!patchNoteList) return;
+function updatePatchNotes(game: GameType) {
+    const listElement = game === 'poe' ? patchNoteListPoe : patchNoteListPoe2;
+    if (!listElement) return;
 
     updateMoreButton(game);
 
     // 1. Initial Render from Cache
     const initialNotes = cachedPatchNotes[game] || [];
     if (initialNotes.length > 0) {
-        renderPatchNotes(initialNotes.slice(0, patchNoteCount));
+        renderPatchNotes(initialNotes.slice(0, patchNoteCount), game);
     } else {
-        patchNoteList.innerHTML = '<li class="loading">로딩중...</li>';
+        listElement.innerHTML = '<li class="loading">로딩중...</li>';
     }
 
-    // 2. Fetch Fresh Data
+    // 2. Fetch Fresh Data (Background)
     const apiGame = game === 'poe' ? 'poe1' : 'poe2';
-    const fetchedNotes = await fetchPatchNotes(apiGame, patchNoteCount);
 
-    // 3. Diff and Merge Logic
-    // "New" = Item in fetched list BUT NOT in cached list (by link)
-    // We want to preserve "isNew" status of cached items?
-    // User request: "When overwriting, affix N to non-duplicated posts"
-    // Interpretation: 
-    // - Load previously cached list (Old Cache)
-    // - Fetch new list (New Fetch)
-    // - For each item in New Fetch:
-    //   - If it exists in Old Cache, it is NOT new (isNew = false).
-    //   - If it does NOT exist in Old Cache, it IS new (isNew = true).
+    fetchPatchNotes(apiGame, patchNoteCount).then(fetchedNotes => {
+        // 3. Diff and Merge Logic
+        const processedNotes: PatchNote[] = fetchedNotes.map(newNote => {
+            const existsInCache = initialNotes.some(cached => cached.link === newNote.link);
+            return {
+                ...newNote,
+                isNew: !existsInCache // Marked New if not found in previous cache
+            };
+        });
 
-    const processedNotes: PatchNote[] = fetchedNotes.map(newNote => {
-        const existsInCache = initialNotes.some(cached => cached.link === newNote.link);
-        return {
-            ...newNote,
-            isNew: !existsInCache // Marked New if not found in previous cache
-        };
+        // 4. Update Cache & Render
+        if (processedNotes.length > 0) {
+            // Simple equality check to avoid unnecessary re-renders
+            if (JSON.stringify(processedNotes) !== JSON.stringify(initialNotes)) {
+                cachedPatchNotes[game] = processedNotes;
+                saveSetting(STORAGE_KEYS.CACHED_PATCH_NOTES, cachedPatchNotes);
+                renderPatchNotes(processedNotes, game);
+            }
+        } else if (initialNotes.length === 0) {
+            listElement.innerHTML = '<li class="empty">패치노트를 불러오지 못했습니다.</li>';
+        }
     });
-
-    // 4. Update Cache & Render
-    // Only update and re-render if there's actual data
-    if (processedNotes.length > 0) {
-        cachedPatchNotes[game] = processedNotes;
-        saveSetting(STORAGE_KEYS.CACHED_PATCH_NOTES, cachedPatchNotes);
-        renderPatchNotes(processedNotes);
-    } else if (initialNotes.length === 0) {
-        patchNoteList.innerHTML = '<li class="empty">패치노트를 불러오지 못했습니다.</li>';
-    }
 }
 
 async function updateGameUI(game: GameType) {
@@ -300,6 +296,19 @@ async function updateGameUI(game: GameType) {
     launchBtn.dataset.url = config.url;
     if (btnHomepage) btnHomepage.href = config.homepageUrl;
     if (btnTrade) btnTrade.href = config.tradeUrl;
+
+    if (btnTrade) btnTrade.href = config.tradeUrl;
+
+    // Patch List Visibility
+    if (patchNoteListPoe && patchNoteListPoe2) {
+        if (game === 'poe') {
+            patchNoteListPoe.style.display = 'block';
+            patchNoteListPoe2.style.display = 'none';
+        } else {
+            patchNoteListPoe.style.display = 'none';
+            patchNoteListPoe2.style.display = 'block';
+        }
+    }
 
     // Notices (Stale-While-Revalidate)
     // 1. Render Cached
