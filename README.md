@@ -18,7 +18,7 @@
 [buy-me-a-coffee-badge]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-yellow?logo=buymeacoffee&logoColor=white
 
 <!-- Links -->
-[chrome-web-store-link]: https://chrome.google.com/webstore/detail/poe2-trade-butler/ipnemofnhodcgcplnnfekbfpmngeeocm
+[chrome-web-store-link]: https://chrome.google.com/webstore/detail/poe2-trade-butler/cpghdafmhbkggpehfhcdicaoponodbje
 [github-release-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/releases
 [build-status-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions
 [github-license-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/blob/master/LICENSE
