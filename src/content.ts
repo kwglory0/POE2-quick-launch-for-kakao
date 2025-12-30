@@ -237,6 +237,12 @@ function startPolling(settings: AppSettings) {
 }
 
 function manageIntroModal(preferTodayClose: boolean) {
+    // Check for existing cookie first to avoid redundant operations and potential site errors
+    if (document.cookie.includes('POE2_INTRO_MODAL=1')) {
+        console.log('Intro Modal cookie already present. Skipping modal logic.');
+        return;
+    }
+
     console.log(`Managing Intro Modal. Prefer 'Today Close': ${preferTodayClose}`);
 
     if (preferTodayClose) {
