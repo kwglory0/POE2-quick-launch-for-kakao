@@ -23,11 +23,11 @@ const patchNoteCountInput = document.getElementById('patchNoteCountInput') as HT
 const logoPoe = document.getElementById('logoPoe') as HTMLImageElement;
 const logoPoe2 = document.getElementById('logoPoe2') as HTMLImageElement;
 
-// Stacked Drawer Elements
-const settingsToggle = document.getElementById('settingsToggle') as HTMLElement;
-const settingsContent = document.getElementById('settingsContent') as HTMLElement;
-const patchNotesToggle = document.getElementById('patchNotesToggle') as HTMLElement;
-const patchNotesContent = document.getElementById('patchNotesContent') as HTMLElement;
+// Tab Elements
+const tabBtnPatchNotes = document.getElementById('tabBtnPatchNotes') as HTMLButtonElement;
+const tabBtnSettings = document.getElementById('tabBtnSettings') as HTMLButtonElement;
+const tabPanelPatchNotes = document.getElementById('tabPanelPatchNotes') as HTMLDivElement;
+const tabPanelSettings = document.getElementById('tabPanelSettings') as HTMLDivElement;
 
 let selectedGame: GameType = 'poe2'; // Default local state, will be updated from storage
 let patchNoteCount = 3;
@@ -330,34 +330,80 @@ async function updateGameUI(game: GameType) {
     updatePatchNotes(game);
 }
 
-// ... Drawer and Event Listeners (Same as before) ...
 
-function toggleDrawerStack(target: 'settings' | 'patchNotes') {
-    const isSettingsTarget = target === 'settings';
 
-    if (isSettingsTarget) {
-        const willOpen = !settingsContent.classList.contains('open');
-        settingsContent.classList.toggle('open', willOpen);
-        settingsToggle.classList.toggle('active', willOpen);
+// function switchTab(tab: 'patchNotes' | 'settings') {
+//     const isPatchNotesActive = tabBtnPatchNotes.classList.contains('active');
+//     const isSettingsActive = tabBtnSettings.classList.contains('active');
 
-        if (willOpen) {
-            patchNotesContent.classList.remove('open');
-            patchNotesToggle.classList.remove('active');
-        }
+//     // Case 1: Clicking the already active tab -> Toggle Collapse
+//     if ((tab === 'patchNotes' && isPatchNotesActive) || (tab === 'settings' && isSettingsActive)) {
+//         tabContentContainer.classList.toggle('collapsed');
+//         // Optional: Toggle active state of button to reflect 'closed'? 
+//         // User requested "fold/unfold", keeping button active lets them know which tab *would* be open.
+//         // But to look "closed", maybe we should remove active highlight?
+//         // Let's keep one tab logically "selected" but visually dim if collapsed?
+//         // Actually, previous behavior was removing 'active' class from handle.
+//         if (tabContentContainer.classList.contains('collapsed')) {
+//             if (tab === 'patchNotes') tabBtnPatchNotes.classList.remove('active');
+//             if (tab === 'settings') tabBtnSettings.classList.remove('active');
+//         } else {
+//             if (tab === 'patchNotes') tabBtnPatchNotes.classList.add('active');
+//             if (tab === 'settings') tabBtnSettings.classList.add('active');
+//         }
+//         return;
+//     }
+
+//     // Case 2: Switching Tabs -> Always Open
+//     tabContentContainer.classList.remove('collapsed');
+
+//     if (tab === 'patchNotes') {
+//         tabBtnPatchNotes.classList.add('active');
+//         tabBtnSettings.classList.remove('active');
+//         tabPanelPatchNotes.classList.add('active');
+//         tabPanelSettings.classList.remove('active');
+//     } else {
+//         tabBtnSettings.classList.add('active');
+//         tabBtnPatchNotes.classList.remove('active');
+//         tabPanelSettings.classList.add('active');
+//         tabPanelPatchNotes.classList.remove('active');
+//     }
+// }
+
+function switchTab(targetTab: 'patchNotes' | 'settings') {
+    // 1. Identify current state
+    const isPatchNotesActive = tabPanelPatchNotes.classList.contains('active');
+    const isSettingsActive = tabPanelSettings.classList.contains('active');
+
+    // 2. Check if we are closing the current tab (Fold)
+    if ((targetTab === 'patchNotes' && isPatchNotesActive) || (targetTab === 'settings' && isSettingsActive)) {
+        // Close everything
+        tabPanelPatchNotes.classList.remove('active');
+        tabPanelSettings.classList.remove('active');
+        tabBtnPatchNotes.classList.remove('active');
+        tabBtnSettings.classList.remove('active');
+        return;
+    }
+
+    // 3. Switching or Opening Logic
+    // Reset all first (Triggers exit change for active one)
+    tabPanelPatchNotes.classList.remove('active');
+    tabPanelSettings.classList.remove('active');
+    tabBtnPatchNotes.classList.remove('active');
+    tabBtnSettings.classList.remove('active');
+
+    // Activate Target (Triggers enter animation)
+    if (targetTab === 'patchNotes') {
+        tabPanelPatchNotes.classList.add('active');
+        tabBtnPatchNotes.classList.add('active');
     } else {
-        const willOpen = !patchNotesContent.classList.contains('open');
-        patchNotesContent.classList.toggle('open', willOpen);
-        patchNotesToggle.classList.toggle('active', willOpen);
-
-        if (willOpen) {
-            settingsContent.classList.remove('open');
-            settingsToggle.classList.remove('active');
-        }
+        tabPanelSettings.classList.add('active');
+        tabBtnSettings.classList.add('active');
     }
 }
 
-if (settingsToggle) settingsToggle.addEventListener('click', () => toggleDrawerStack('settings'));
-if (patchNotesToggle) patchNotesToggle.addEventListener('click', () => toggleDrawerStack('patchNotes'));
+if (tabBtnPatchNotes) tabBtnPatchNotes.addEventListener('click', () => switchTab('patchNotes'));
+if (tabBtnSettings) tabBtnSettings.addEventListener('click', () => switchTab('settings'));
 
 logoPoe.addEventListener('click', () => {
     if (selectedGame !== 'poe') {

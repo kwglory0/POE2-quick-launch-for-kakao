@@ -50,82 +50,77 @@
       </div>
 
       <!-- 2. Menu Section (Middle: Fills Remaining Space) -->
-      <div class="drawer-container">
-        <!-- 1. Settings Block (Dom First = Visual Bottom in Column-Reverse) -->
-        <div class="drawer-block">
-          <div id="settingsToggle" class="drawer-handle">
-            <span class="header-text">설정</span>
-            <span class="arrow-indicator">▲</span>
-          </div>
-          <div id="settingsContent" class="drawer-content settings-content">
-            <div class="control-group">
-              <span class="label-text">자동 실행 후 탭 닫기</span>
-              <label class="switch">
-                <input type="checkbox" id="closeTabToggle" />
-                <span class="slider round"></span>
-              </label>
-            </div>
+      <!-- 2. Tab Content Section (Middle: Fills Remaining Space, Scrollable) -->
+      <div id="tabContentContainer" class="tab-content-container">
 
-            <div class="control-group">
-              <div class="label-container">
-                <span class="label-text">플러그인 공지사항 표시</span>
-                <div class="tooltip-wrapper">
-                  <span class="info-icon">i</span>
-                  <div class="tooltip-popup">
-                    <img src="assets/notice-info.png" alt="Notice Info" />
-                  </div>
-                </div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="showNoticesToggle" />
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="control-group">
-              <div class="label-container">
-                <span class="label-text">홈페이지 이벤트 창 자동 닫기</span>
-                <div class="tooltip-wrapper">
-                  <span class="info-icon">i</span>
-                  <div class="tooltip-popup">
-                    <img src="assets/modal-info.png" alt="Popup Info" />
-                  </div>
-                </div>
-              </div>
-              <label class="switch">
-                <input type="checkbox" id="closePopupToggle" />
-                <span class="slider round"></span>
-              </label>
-            </div>
-
-            <div class="control-group">
-              <span class="label-text">패치노트 표시 수 (최대 20)</span>
-              <input type="number" id="patchNoteCountInput" class="setting-input-number" min="1" max="20" />
-            </div>
-
-            <!-- Do NOT move this! Plugin Disable must be at the bottom -->
-            <div class="control-group" id="pluginDisableGroup">
-              <span class="label-text">플러그인 비활성화</span>
-              <label class="switch">
-                <input type="checkbox" id="pluginDisableToggle" />
-                <span class="slider round red"></span>
-              </label>
-            </div>
-          </div>
+        <!-- Tab 1: Patch Notes (Default Active) -->
+        <div id="tabPanelPatchNotes" class="tab-panel active">
+          <ul id="patchNoteList-poe" class="patch-note-list" style="display: none;"></ul>
+          <ul id="patchNoteList-poe2" class="patch-note-list" style="display: none;"></ul>
+          <a id="patchNoteMoreBtn" href="#" target="_blank" class="patch-note-more">더보기</a>
         </div>
 
-        <!-- 2. Patch Notes Block (Dom Second = Visual Top in Column-Reverse) -->
-        <div class="drawer-block">
-          <div id="patchNotesToggle" class="drawer-handle active">
-            <span class="header-text">패치 노트</span>
-            <span class="arrow-indicator">▼</span>
+        <!-- Tab 2: Settings -->
+        <div id="tabPanelSettings" class="tab-panel">
+          <div class="control-group">
+            <span class="label-text">자동 실행 후 탭 닫기</span>
+            <label class="switch">
+              <input type="checkbox" id="closeTabToggle" />
+              <span class="slider round"></span>
+            </label>
           </div>
-          <div id="patchNotesContent" class="drawer-content patch-notes-content open">
-            <ul id="patchNoteList-poe" class="patch-note-list" style="display: none;"></ul>
-            <ul id="patchNoteList-poe2" class="patch-note-list" style="display: none;"></ul>
-            <a id="patchNoteMoreBtn" href="#" target="_blank" class="patch-note-more">더보기</a>
+
+          <div class="control-group">
+            <div class="label-container">
+              <span class="label-text">플러그인 공지사항 표시</span>
+              <div class="tooltip-wrapper">
+                <span class="info-icon">i</span>
+                <div class="tooltip-popup">
+                  <img src="assets/notice-info.png" alt="Notice Info" />
+                </div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showNoticesToggle" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <div class="label-container">
+              <span class="label-text">홈페이지 이벤트 창 자동 닫기</span>
+              <div class="tooltip-wrapper">
+                <span class="info-icon">i</span>
+                <div class="tooltip-popup">
+                  <img src="assets/modal-info.png" alt="Popup Info" />
+                </div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="closePopupToggle" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="control-group">
+            <span class="label-text">패치노트 표시 수 (최대 20)</span>
+            <input type="number" id="patchNoteCountInput" class="setting-input-number" min="1" max="20" />
+          </div>
+
+          <div class="control-group" id="pluginDisableGroup">
+            <span class="label-text">플러그인 비활성화</span>
+            <label class="switch">
+              <input type="checkbox" id="pluginDisableToggle" />
+              <span class="slider round red"></span>
+            </label>
           </div>
         </div>
+      </div>
+
+      <!-- Bottom Tab Navigation -->
+      <div class="bottom-tab-nav">
+        <button id="tabBtnPatchNotes" class="tab-btn active">패치노트</button>
+        <button id="tabBtnSettings" class="tab-btn">설정</button>
       </div>
 
       <div class="footer-section">

@@ -68,72 +68,104 @@ body.bg-poe2 {
   z-index: 10;
 }
 
-/* 2. Menu Section (Middle - Fills remaining space) */
-.drawer-container {
+/* 2. Menu Section */
+.tab-content-container {
   flex: 1 1 auto;
-  display: flex;
-  flex-direction: column-reverse;
-  min-height: 0;
-  margin-bottom: 0;
-  overflow: hidden;
   position: relative;
-  z-index: 50;
-}
-
-/* Harmonized drawer transitions */
-.drawer-block {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  width: 100%;
-  transition: flex 0.4s ease-in-out;
   overflow: hidden;
-}
-
-.drawer-block:has(.open) {
-  flex: 1 1 auto;
+  /* Hide overflowing panels during transition */
+  background: transparent;
+  /* Changed: Transparent to show main BG when empty */
   min-height: 0;
 }
 
-/* Content Panel */
-.drawer-content {
-  position: relative;
+/* Remove collapsing logic for container size */
+.tab-content-container.collapsed {
+  /* No size change, just visual consistency if needed */
+}
+
+/* Tab Panels - Absolute Positioning for Overlay Animations */
+.tab-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  background: var(--theme-footer-bg, rgba(10, 14, 10, 0.95));
+  height: 100%;
+  padding: 12px 14px;
   box-sizing: border-box;
-  max-height: 0;
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-  box-shadow: none;
-}
-
-.drawer-content.open {
-  flex: 1 1 auto;
-  max-height: 1000px;
-  opacity: 1;
   overflow-y: auto;
+  /* Internal scrolling */
+  overflow-x: hidden;
+
+  /* Visual Styles moved from Container */
+  background: var(--theme-footer-bg, rgba(10, 14, 10, 0.95));
   border-bottom: 1px solid rgba(223, 207, 153, 0.1);
+
+  /* Transition State: Hidden/Bottom */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  /* Prevent clicks when hidden */
+  z-index: 10;
 }
 
-/* 3. Footer Section (Bottom) */
-.footer-section {
-  flex: 0 0 auto;
-  position: relative;
+/* Scrollbar for Panels */
+.tab-panel::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tab-panel::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.tab-panel::-webkit-scrollbar-thumb {
+  background: #7a6e5d;
+}
+
+.tab-panel.active {
+  /* Active State: Visible/Home */
+  display: block;
+  /* Ensure it's rendered */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  z-index: 20;
+}
+
+/* Bottom Tab Navigation */
+.bottom-tab-nav {
+  display: flex;
+  flex: 0 0 36px;
+  background: #0e0e0e;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 60;
-  background: var(--theme-footer-bg, #0c150c);
-  padding-bottom: 0;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
 }
 
-/* ... existing code ... */
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #888;
+  font-family: 'Fontin', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+}
 
-.drawer-handle.active {
-  background: var(--theme-footer-bg, #1a221a);
-  color: var(--theme-accent, #fff);
-  /* Use Accent for Active Text */
-  text-shadow: 0 0 8px rgba(223, 207, 153, 0.6);
-  border-left: 3px solid var(--theme-accent, #dfcf99);
-  padding-left: 13px;
+.tab-btn:hover {
+  color: #ccc;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  color: var(--theme-accent, #dfcf99);
+  border-bottom: 2px solid var(--theme-accent, #dfcf99);
+  background: rgba(223, 207, 153, 0.05);
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(223, 207, 153, 0.4);
 }
 
 /* Reset Description Styles */
@@ -639,15 +671,16 @@ img.inactive {
 }
 
 /* Scrollbars */
-.drawer-content::-webkit-scrollbar {
+/* Scrollbars */
+.tab-content-container::-webkit-scrollbar {
   width: 4px;
 }
 
-.drawer-content::-webkit-scrollbar-track {
+.tab-content-container::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.drawer-content::-webkit-scrollbar-thumb {
+.tab-content-container::-webkit-scrollbar-thumb {
   background: #7a6e5d;
 }
 
