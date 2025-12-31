@@ -1,23 +1,20 @@
 // popup.ts
-import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS, Notice, ThemeColors } from './storage';
+import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS, Notice, ThemeColors, AppSettings } from './storage';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
 import { fetchNotices } from './notice';
+import { SETTINGS_CONFIG, SettingItem } from './settings';
 
-// Type assertions for stronger typing
-const closeTabToggle = document.getElementById('closeTabToggle') as HTMLInputElement;
-const closePopupToggle = document.getElementById('closePopupToggle') as HTMLInputElement;
-const showNoticesToggle = document.getElementById('showNoticesToggle') as HTMLInputElement;
-const pluginDisableToggle = document.getElementById('pluginDisableToggle') as HTMLInputElement;
+
 const launchBtn = document.getElementById('launchBtn') as HTMLAnchorElement;
 const noticeContainer = document.getElementById('noticeContainer') as HTMLDivElement;
 const btnHomepage = document.getElementById('btnHomepage') as HTMLAnchorElement;
 const btnTrade = document.getElementById('btnTrade') as HTMLAnchorElement;
+const settingsContainer = document.getElementById('settingsContainer') as HTMLDivElement;
 
 // Patch Note Elements
 const patchNoteListPoe = document.getElementById('patchNoteList-poe') as HTMLUListElement;
 const patchNoteListPoe2 = document.getElementById('patchNoteList-poe2') as HTMLUListElement;
 const patchNoteMoreBtn = document.getElementById('patchNoteMoreBtn') as HTMLAnchorElement;
-const patchNoteCountInput = document.getElementById('patchNoteCountInput') as HTMLInputElement;
 
 // Game Switcher Elements
 const logoPoe = document.getElementById('logoPoe') as HTMLImageElement;
@@ -334,43 +331,7 @@ async function updateGameUI(game: GameType) {
 
 
 
-// function switchTab(tab: 'patchNotes' | 'settings') {
-//     const isPatchNotesActive = tabBtnPatchNotes.classList.contains('active');
-//     const isSettingsActive = tabBtnSettings.classList.contains('active');
 
-//     // Case 1: Clicking the already active tab -> Toggle Collapse
-//     if ((tab === 'patchNotes' && isPatchNotesActive) || (tab === 'settings' && isSettingsActive)) {
-//         tabContentContainer.classList.toggle('collapsed');
-//         // Optional: Toggle active state of button to reflect 'closed'? 
-//         // User requested "fold/unfold", keeping button active lets them know which tab *would* be open.
-//         // But to look "closed", maybe we should remove active highlight?
-//         // Let's keep one tab logically "selected" but visually dim if collapsed?
-//         // Actually, previous behavior was removing 'active' class from handle.
-//         if (tabContentContainer.classList.contains('collapsed')) {
-//             if (tab === 'patchNotes') tabBtnPatchNotes.classList.remove('active');
-//             if (tab === 'settings') tabBtnSettings.classList.remove('active');
-//         } else {
-//             if (tab === 'patchNotes') tabBtnPatchNotes.classList.add('active');
-//             if (tab === 'settings') tabBtnSettings.classList.add('active');
-//         }
-//         return;
-//     }
-
-//     // Case 2: Switching Tabs -> Always Open
-//     tabContentContainer.classList.remove('collapsed');
-
-//     if (tab === 'patchNotes') {
-//         tabBtnPatchNotes.classList.add('active');
-//         tabBtnSettings.classList.remove('active');
-//         tabPanelPatchNotes.classList.add('active');
-//         tabPanelSettings.classList.remove('active');
-//     } else {
-//         tabBtnSettings.classList.add('active');
-//         tabBtnPatchNotes.classList.remove('active');
-//         tabPanelSettings.classList.add('active');
-//         tabPanelPatchNotes.classList.remove('active');
-//     }
-// }
 
 function switchTab(targetTab: 'patchNotes' | 'settings' | 'help') {
     // 1. Identify current state
@@ -432,58 +393,155 @@ logoPoe2.addEventListener('click', () => {
     }
 });
 
-closeTabToggle.addEventListener('change', () => {
-    saveSetting(STORAGE_KEYS.CLOSE_TAB, closeTabToggle.checked);
-});
+function handleSettingAction(item: SettingItem, value: any) {
+    if (!item.actionId) return;
 
-closePopupToggle.addEventListener('change', () => {
-    saveSetting(STORAGE_KEYS.CLOSE_POPUP, closePopupToggle.checked);
-});
-
-showNoticesToggle.addEventListener('change', () => {
-    const isShown = showNoticesToggle.checked;
-    saveSetting(STORAGE_KEYS.SHOW_NOTICES, isShown);
-    if (noticeContainer) {
-        noticeContainer.style.display = isShown ? 'flex' : 'none';
+    if (item.actionId === 'togglePluginDisable') {
+        updatePluginDisabledState(value);
+    } else if (item.actionId === 'updatePatchNoteCount') {
+        // Value is already saved via general handler, just update UI
+        patchNoteCount = value;
+        updatePatchNotes(selectedGame);
     }
-});
-
-pluginDisableToggle.addEventListener('change', () => {
-    const isDisabled = pluginDisableToggle.checked;
-    saveSetting(STORAGE_KEYS.PLUGIN_DISABLED, isDisabled);
-    updatePluginDisabledState(isDisabled);
-});
-
-patchNoteCountInput.addEventListener('change', () => {
-    let val = parseInt(patchNoteCountInput.value);
-    if (val < 1) val = 1;
-    if (val > 20) val = 20;
-    patchNoteCountInput.value = val.toString();
-
-    patchNoteCount = val;
-    saveSetting(STORAGE_KEYS.PATCH_NOTE_COUNT, val);
-    updatePatchNotes(selectedGame);
-});
+}
 
 function updatePluginDisabledState(isDisabled: boolean) {
     if (isDisabled) {
         document.body.classList.add('plugin-disabled');
         launchBtn.style.pointerEvents = 'none';
         launchBtn.removeAttribute('href');
-        // Homepage & Trade links should remain active
+        if (settingsContainer) {
+            const toggle = settingsContainer.querySelector(`input[data-key="pluginDisable"]`) as HTMLInputElement;
+            if (toggle) toggle.checked = true;
+        }
     } else {
         document.body.classList.remove('plugin-disabled');
         launchBtn.style.pointerEvents = 'auto';
         launchBtn.href = '#';
-        // Homepage & Trade links remain active
+        if (settingsContainer) {
+            const toggle = settingsContainer.querySelector(`input[data-key="pluginDisable"]`) as HTMLInputElement;
+            if (toggle) toggle.checked = false;
+        }
     }
 }
 
-launchBtn.addEventListener('click', (e) => {
+function renderSettings(settings: AppSettings) {
+    if (!settingsContainer) return;
+    settingsContainer.innerHTML = '';
+
+    SETTINGS_CONFIG.forEach(item => {
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'control-group';
+        if (item.key === 'pluginDisable') groupDiv.id = 'pluginDisableGroup';
+
+        // 1. Label Section (Text + Tooltip)
+        if (item.type === 'switch' && item.tooltip) {
+            const labelContainer = document.createElement('div');
+            labelContainer.className = 'label-container';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'label-text';
+            labelSpan.textContent = item.label;
+
+            const tooltipWrapper = document.createElement('div');
+            tooltipWrapper.className = 'tooltip-wrapper';
+
+            const infoIcon = document.createElement('span');
+            infoIcon.className = 'info-icon';
+            infoIcon.textContent = 'i';
+
+            const tooltipPopup = document.createElement('div');
+            tooltipPopup.className = 'tooltip-popup';
+            const tooltipImg = document.createElement('img');
+            tooltipImg.src = item.tooltip.image;
+            tooltipImg.alt = 'Info';
+
+            tooltipPopup.appendChild(tooltipImg);
+            tooltipWrapper.appendChild(infoIcon);
+            tooltipWrapper.appendChild(tooltipPopup);
+
+            labelContainer.appendChild(labelSpan);
+            labelContainer.appendChild(tooltipWrapper);
+            groupDiv.appendChild(labelContainer);
+
+        } else {
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'label-text';
+            labelSpan.textContent = item.label;
+            groupDiv.appendChild(labelSpan);
+        }
+
+        // 2. Input Section
+        if (item.type === 'switch') {
+            const labelSwitch = document.createElement('label');
+            labelSwitch.className = 'switch';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            let initialValue = settings[item.key];
+            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            input.checked = !!initialValue;
+            input.dataset.key = item.key;
+
+            // Event Listener
+            input.addEventListener('change', () => {
+                const checked = input.checked;
+                saveSetting(item.key, checked);
+            });
+
+            const slider = document.createElement('span');
+            slider.className = 'slider round';
+            if (item.styleClass) slider.classList.add(item.styleClass);
+
+            labelSwitch.appendChild(input);
+            labelSwitch.appendChild(slider);
+            groupDiv.appendChild(labelSwitch);
+
+        } else if (item.type === 'number') {
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'setting-input-number';
+            input.min = item.min.toString();
+            input.max = item.max.toString();
+            let initialValue = settings[item.key];
+            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            input.value = initialValue.toString();
+            input.dataset.key = item.key;
+
+            input.addEventListener('change', () => {
+                let val = parseInt(input.value);
+                if (val < item.min) val = item.min;
+                if (val > item.max) val = item.max;
+                input.value = val.toString(); // Reset visual value if clamped
+
+                saveSetting(item.key, val);
+            });
+
+            groupDiv.appendChild(input);
+        }
+
+        settingsContainer.appendChild(groupDiv);
+    });
+}
+
+launchBtn.addEventListener('click', async (e) => {
     e.preventDefault();
     if (document.body.classList.contains('plugin-disabled')) return;
 
-    const isClosePopupFn = closePopupToggle.checked;
+    // We need to fetch current setting state. 
+    // Optimization: We could keep a local state object efficiently, 
+    // but reading from storage is safe enough or reading from DOM if needed.
+    // Let's rely on storage/loadSettings for consistency or a local variable?
+    // Using loadSettings assumes sync/fast enough for click, but it's async.
+    // Better to check the mapped input element or keep a local cache.
+    // Let's use `localSettings` cache if we had one, or just `chrome.storage` direct read?
+    // Actually, we can check the checkbox state directly from DOM if we want to be synchronous.
+    // But since event loop... let's just re-load settings or keep a global settings object.
+
+    // Simplest: Check the checkbox in DOM since it reflects current state
+    const closePopupCheckbox = document.querySelector(`input[data-key="closePopup"]`) as HTMLInputElement;
+    const isClosePopupFn = closePopupCheckbox ? closePopupCheckbox.checked : false;
+
     const targetUrl = launchBtn.dataset.url || GAME_CONFIG.poe2.url;
 
     chrome.tabs.create({ url: targetUrl }, () => {
@@ -494,24 +552,47 @@ launchBtn.addEventListener('click', (e) => {
 document.addEventListener('DOMContentLoaded', async () => {
     const settings = await loadSettings();
 
-    closeTabToggle.checked = settings.closeTab;
-    closePopupToggle.checked = settings.closePopup;
-    showNoticesToggle.checked = settings.showNotices;
+    // 1. Initial Render of Settings
+    renderSettings(settings);
 
-    // Apply visibility immediately
-    if (noticeContainer) {
-        noticeContainer.style.display = settings.showNotices ? 'flex' : 'none';
-    }
+    // 2. Apply initial states of special actions
+
 
     const isDisabled = settings.pluginDisable;
-    pluginDisableToggle.checked = isDisabled;
     updatePluginDisabledState(isDisabled);
 
     patchNoteCount = settings.patchNoteCount;
-    patchNoteCountInput.value = patchNoteCount.toString();
     cachedPatchNotes = settings.cachedPatchNotes || DEFAULT_SETTINGS.cachedPatchNotes; // Load cache
     cachedNotices = settings.cachedNotices || DEFAULT_SETTINGS.cachedNotices;
     cachedThemeColors = settings.cachedThemeColors || DEFAULT_SETTINGS.cachedThemeColors;
 
     updateGameUI(settings.selectedGame);
+});
+
+// Reactive Settings Listener
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace !== 'local') return;
+
+    for (const [key, { newValue }] of Object.entries(changes)) {
+        const item = SETTINGS_CONFIG.find(i => i.key === key);
+        if (item) {
+            // 1. Trigger Action Side-Effects
+            if (item.actionId) {
+                handleSettingAction(item, newValue);
+            }
+
+            // 2. Sync UI State (if changed externally)
+            if (settingsContainer) {
+                const input = settingsContainer.querySelector(`input[data-key="${item.key}"]`) as HTMLInputElement;
+                if (input) {
+                    // Check if value actually differs to avoid cursor jumps or loops (though 'change' event breaks loop)
+                    if (item.type === 'switch' && input.checked !== !!newValue) {
+                        input.checked = !!newValue;
+                    } else if (item.type === 'number' && input.value !== (newValue as any).toString()) {
+                        input.value = (newValue as any).toString();
+                    }
+                }
+            }
+        }
+    }
 });
