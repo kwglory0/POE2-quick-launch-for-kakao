@@ -24,7 +24,8 @@
         {
             "matches": [
                 "*://*.game.daum.net/*",
-                "*://*.daum.net/*"
+                "*://*.daum.net/*",
+                "*://*.kakao.com/*"
             ],
             "js": [
                 "src/content.ts"
@@ -33,7 +34,8 @@
     ],
     "host_permissions": [
         "*://*.game.daum.net/*",
-        "*://*.daum.net/*"
+        "*://*.daum.net/*",
+        "*://*.kakao.com/*"
     ],
     "permissions": [
         "storage",

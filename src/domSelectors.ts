@@ -71,7 +71,23 @@ export const SELECTORS = {
     },
 
     // -------------------------------------------------------------------------
-    // 4. POE Main Page (poe.game.daum.net)
+    // 4. Daum Login Page (logins.daum.net)
+    // -------------------------------------------------------------------------
+    LOGIN_DAUM: {
+        // "Kakao Login" button
+        BTN_KAKAO_LOGIN: '.login__container--btn-kakao'
+    },
+
+    // -------------------------------------------------------------------------
+    // 5. Kakao Auth Page (kauth.kakao.com)
+    // -------------------------------------------------------------------------
+    KAKAO_AUTH: {
+        // "Agree / Continue" buttons
+        BTN_AGREE: '.btn_agree, button[type="submit"].btn_g'
+    },
+
+    // -------------------------------------------------------------------------
+    // 6. POE Main Page (poe.game.daum.net)
     // -------------------------------------------------------------------------
     POE: {
         BTN_GAME_START: '#signupButton'

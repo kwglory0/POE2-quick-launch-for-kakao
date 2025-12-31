@@ -8,18 +8,184 @@ loadSettings().then((settings) => {
     dispatchPageLogic(settings);
 });
 
-// Listen for Hash Changes
+// Listen for Hash Changes (Auto Start Re-trigger)
 window.addEventListener('hashchange', async () => {
     console.log('[Content] Hash changed:', window.location.hash);
     if (window.location.hash.includes('#autoStart')) {
         const settings = await loadSettings();
 
-        if (window.location.pathname.includes('/main')) {
-            console.log('[Content] #autoStart detected via Hash Change. Re-triggering logic with fresh settings.');
-            handlePoe2Page(settings);
+        // Only POE2 Main Page re-triggering logic for now
+        const currentUrl = new URL(window.location.href);
+        if (Poe2MainHandler.match(currentUrl)) {
+            console.log('[Content] #autoStart detected via Hash Change. Re-triggering logic.');
+            Poe2MainHandler.execute(settings);
         }
     }
 });
+
+// -----------------------------------------------------------------------------
+// Interface Definitions
+// -----------------------------------------------------------------------------
+
+interface PageHandler {
+    name: string;
+    description: string;
+    match: (url: URL) => boolean;
+    allowedReferrers?: string[];
+    execute: (settings: AppSettings) => void;
+}
+
+// -----------------------------------------------------------------------------
+// Handlers
+// -----------------------------------------------------------------------------
+
+const PoeMainHandler: PageHandler = {
+    name: 'PoeMainHandler',
+    description: 'POE1 Homepage - Auto Start',
+    match: (url) => url.hostname === 'poe.game.daum.net',
+    execute: (settings) => {
+        console.log(`[Handler Execute] ${PoeMainHandler.description}`);
+        if (window.location.hash.includes('#autoStart')) {
+            console.log('Auto Start triggered on POE.');
+            handlePoeAutoStart(settings);
+        }
+    }
+};
+
+const Poe2MainHandler: PageHandler = {
+    name: 'Poe2MainHandler',
+    description: 'POE2 Homepage - Auto Start & Modal Handling',
+    match: (url) => url.hostname === 'pathofexile2.game.daum.net' && url.pathname.includes('/main'),
+    execute: (settings) => {
+        console.log(`[Handler Execute] ${Poe2MainHandler.description}`);
+        const shouldDismissToday = settings.closePopup;
+        const isAutoStart = window.location.hash.includes('#autoStart');
+
+        if (shouldDismissToday || isAutoStart) {
+            manageIntroModal(shouldDismissToday);
+        }
+
+        if (isAutoStart) {
+            console.log('Auto Start triggered on Homepage.');
+            chrome.runtime.sendMessage({ action: 'setAutoSequence', value: true });
+            startPolling(settings);
+        }
+    }
+};
+
+const LauncherCheckHandler: PageHandler = {
+    name: 'LauncherCheckHandler',
+    description: 'Launcher Game Start Check & Init Page (When Not Logged In)',
+    match: (url) => {
+        if (url.hostname !== 'pubsvc.game.daum.net') return false;
+        // Check for specific game start pages (poe.html or poe2.html)
+        return url.pathname.includes('/gamestart/poe.html') || url.pathname.includes('/gamestart/poe2.html');
+    },
+    allowedReferrers: ['poe.game.daum.net', 'pathofexile2.game.daum.net', 'logins.daum.net', 'pubsvc.game.daum.net'],
+    execute: (settings) => {
+        console.log(`[Handler Execute] ${LauncherCheckHandler.description}`);
+        performLauncherPageLogic(settings);
+    }
+};
+
+const DaumLoginHandler: PageHandler = {
+    name: 'DaumLoginHandler',
+    description: 'Daum Login Check Page (When Not Logged In) - Auto Click Kakao Login',
+    match: (url) => {
+        if (url.hostname !== 'logins.daum.net') return false;
+
+        // Verify 'url' parameter validates against LauncherCheckHandler logic (targets POE/POE2)
+        const nextUrlParam = url.searchParams.get('url');
+        if (!nextUrlParam) return false;
+
+        try {
+            const nextUrl = new URL(decodeURIComponent(nextUrlParam)); // Decoded target URL
+            return nextUrl.hostname === 'pubsvc.game.daum.net' &&
+                (nextUrl.pathname.includes('/gamestart/poe.html') || nextUrl.pathname.includes('/gamestart/poe2.html'));
+        } catch (e) {
+            return false;
+        }
+    },
+    allowedReferrers: ['pubsvc.game.daum.net'],
+    execute: (_settings) => {
+        console.log(`[Handler Execute] ${DaumLoginHandler.description}`);
+        const kakaoLoginBtn = document.querySelector(SELECTORS.LOGIN_DAUM.BTN_KAKAO_LOGIN);
+        if (kakaoLoginBtn) {
+            console.log('Found "Kakao Login" button. Clicking...');
+            safeClick(kakaoLoginBtn as HTMLElement);
+        }
+    }
+};
+
+const KakaoManualLoginHandler: PageHandler = {
+    name: 'KakaoManualLoginHandler',
+    description: 'Kakao Manual Login Page (When Not Logged In) - Manual Input Required',
+    match: (url) => url.hostname === 'accounts.kakao.com',
+    execute: (_settings) => {
+        console.log(`[Handler Execute] ${KakaoManualLoginHandler.description}`);
+        console.log('User must log in manually here. Automation paused.');
+    }
+};
+
+const KakaoAuthHandler: PageHandler = {
+    name: 'KakaoAuthHandler',
+    description: 'Kakao Auth/Continue Page (When Not Logged In) - Auto Click Agree',
+    match: (url) => url.hostname === 'kauth.kakao.com' && url.pathname.includes('/oauth/authorize'),
+    allowedReferrers: ['logins.daum.net', 'accounts.kakao.com'],
+    execute: (_settings) => {
+        console.log(`[Handler Execute] ${KakaoAuthHandler.description}`);
+        const agreeBtn = document.querySelector(SELECTORS.KAKAO_AUTH.BTN_AGREE) as HTMLElement;
+        if (agreeBtn) {
+            console.log('Found "Agree/Continue" button. Clicking...');
+            safeClick(agreeBtn);
+        }
+    }
+};
+
+const SecurityCenterHandler: PageHandler = {
+    name: 'SecurityCenterHandler',
+    description: 'Designated PC / Security Page - Auto Click Confirm',
+    match: (url) => url.hostname === 'security-center.game.daum.net',
+    allowedReferrers: ['pubsvc.game.daum.net', 'accounts.kakao.com', 'kauth.kakao.com'],
+    execute: (_settings) => {
+        console.log(`[Handler Execute] ${SecurityCenterHandler.description}`);
+        performSecurityPageLogic();
+    }
+};
+
+const LauncherCompletionHandler: PageHandler = {
+    name: 'LauncherCompletionHandler',
+    description: 'Launcher Execution Confirmation Page',
+    match: (url) => {
+        if (url.hostname !== 'pubsvc.game.daum.net') return false;
+        if (!url.pathname.includes('/securitycenter') || !url.pathname.includes('/completed.html')) return false;
+
+        // Verify gameCode is 'poe' or 'poe2'
+        const gameCode = url.searchParams.get('gameCode');
+        return gameCode === 'poe' || gameCode === 'poe2';
+    },
+    allowedReferrers: ['security-center.game.daum.net'],
+    execute: (settings) => {
+        console.log(`[Handler Execute] ${LauncherCompletionHandler.description}`);
+        performLauncherPageLogic(settings);
+    }
+};
+
+// Priority list (order matters)
+const HANDLERS: PageHandler[] = [
+    PoeMainHandler,
+    Poe2MainHandler,
+    LauncherCheckHandler,
+    DaumLoginHandler,
+    KakaoManualLoginHandler,
+    KakaoAuthHandler,
+    SecurityCenterHandler,
+    LauncherCompletionHandler
+];
+
+// -----------------------------------------------------------------------------
+// Core Dispatcher
+// -----------------------------------------------------------------------------
 
 function dispatchPageLogic(settings: AppSettings) {
     if (settings.pluginDisable) {
@@ -27,90 +193,70 @@ function dispatchPageLogic(settings: AppSettings) {
         return;
     }
 
-    const path = window.location.pathname;
-    const hostname = window.location.hostname;
+    const currentUrl = new URL(window.location.href);
+    console.log('Dispatching logic for:', currentUrl.href);
+    console.log('Referrer:', document.referrer);
 
-    console.log('Dispatching logic for:', window.location.href);
+    for (const handler of HANDLERS) {
+        if (!handler.match(currentUrl)) continue;
 
-    if (hostname.includes('poe.game.daum.net')) {
-        handlePoePage(settings);
-    }
-    else if (hostname.includes('pathofexile2.game.daum.net') && path.includes('/main')) {
-        handlePoe2Page(settings);
-    }
-    else if (hostname.includes('security-center')) {
-        handleSecurityCenterPage(settings);
-    }
-    else if (path.includes('gamestart') || hostname.includes('pubsvc')) {
-        handleLauncherPage(settings);
-    }
-    else {
-        console.log(`No specific logic for this page type. {path: ${path}, hostname: ${hostname}}`);
-    }
-}
+        console.log(`[Handler Match] ${handler.name} matched.`);
 
-function handlePoePage(settings: AppSettings) {
-    console.log('Page Type: POE MAIN');
+        // Referrer Validation
+        if (handler.allowedReferrers) {
+            const currentReferrer = document.referrer;
+            // Allow empty matching if list exists but is empty (should not happen based on plan)
+            // If list exists, referrer must match one of them
+            const isValid = handler.allowedReferrers.some(ref => currentReferrer.includes(ref));
 
-    if (window.location.hash.includes('#autoStart')) {
-        console.log('Auto Start triggered on POE.');
-
-        const pollForButton = setInterval(() => {
-            const startBtn = document.querySelector(SELECTORS.POE.BTN_GAME_START) as HTMLElement;
-            if (startBtn) {
-                console.log('Found POE Start Button, clicking...');
-                safeClick(startBtn);
-                clearInterval(pollForButton);
-
-                // [FIX] Local Cleanup for POE1 as well
-                if (!settings.closeTab) {
-                    history.replaceState(null, '', window.location.pathname + window.location.search);
-                }
-
-                // Send signal to potentially close tab if configured (reuse launcher signal)
-                chrome.runtime.sendMessage({
-                    action: 'launcherGameStartClicked',
-                    shouldCloseMainPage: settings.closeTab
-                }, () => {
-                    // Suppress "Receiving end does not exist" error
-                    if (chrome.runtime.lastError) { /* ignore */ }
-                });
+            if (!isValid) {
+                console.warn(`[Handler Skip] ${handler.name} - Invalid Referrer: "${currentReferrer}"`);
+                console.warn(`Allowed: ${JSON.stringify(handler.allowedReferrers)}`);
+                return; // Stop processing since page matched but safety check failed
             }
-        }, 500);
+        }
 
-        // Timeout after 10 seconds
-        setTimeout(() => clearInterval(pollForButton), 10000);
+        handler.execute(settings);
+        return; // Execute only the first matching handler
     }
+
+    console.log('No matching handler found for this page.');
 }
 
-function handlePoe2Page(settings: AppSettings) {
-    console.log('Page Type: POE2 MAIN');
+// -----------------------------------------------------------------------------
+// Helper Logic
+// -----------------------------------------------------------------------------
 
-    const shouldDismissToday = settings.closePopup;
-    const isAutoStart = window.location.hash.includes('#autoStart');
+function handlePoeAutoStart(settings: AppSettings) {
+    const pollForButton = setInterval(() => {
+        const startBtn = document.querySelector(SELECTORS.POE.BTN_GAME_START) as HTMLElement;
+        if (startBtn) {
+            console.log('Found POE Start Button, clicking...');
+            safeClick(startBtn);
+            clearInterval(pollForButton);
 
-    // Modal Logic:
-    // 1. Always Close = True -> Try "Today Close" (ignoring #autoStart)
-    // 2. Always Close = False + #autoStart -> Try "Close" (X button)
-    if (shouldDismissToday || isAutoStart) {
-        manageIntroModal(shouldDismissToday); // Pass true if we prefer "Today Close"
-    }
+            if (!settings.closeTab) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
 
-    if (isAutoStart) {
-        console.log('Auto Start triggered on Homepage.');
-        chrome.runtime.sendMessage({ action: 'setAutoSequence', value: true });
-        startPolling(settings);
-    }
+            chrome.runtime.sendMessage({
+                action: 'launcherGameStartClicked',
+                shouldCloseMainPage: settings.closeTab
+            }, () => {
+                if (chrome.runtime.lastError) { /* ignore */ }
+            });
+        }
+    }, 500);
+
+    setTimeout(() => clearInterval(pollForButton), 10000);
 }
 
-function handleSecurityCenterPage(_settings: AppSettings) {
-    console.log('Page Type: SECURITY_CENTER');
-
+function performSecurityPageLogic() {
     const checkAndClick = (obs?: MutationObserver) => {
         const buttons = Array.from(document.querySelectorAll(SELECTORS.SECURITY.CONFIRM_BUTTONS.join(', ')));
 
         // Priority 0: Designated PC "Confirm" Button
-        const designPcBtn = buttons.find(el => el.classList.contains(SELECTORS.SECURITY.BTN_DESIGNATED_CONFIRM.substring(1))); // remove dot for check
+        const designPcBtn = buttons.find(el => el.classList.contains(SELECTORS.SECURITY.BTN_DESIGNATED_CONFIRM.substring(1)));
         if (designPcBtn) {
             console.log('Found Designated PC Confirm button. Clicking...');
             safeClick(designPcBtn as HTMLElement);
@@ -140,11 +286,8 @@ function handleSecurityCenterPage(_settings: AppSettings) {
     }
 }
 
-function handleLauncherPage(settings: AppSettings) {
-    console.log('Page Type: LAUNCHER / PUBSVC');
-
+function performLauncherPageLogic(settings: AppSettings) {
     const checkAndClick = (obs?: MutationObserver) => {
-        // Construct query string from array
         const query = SELECTORS.LAUNCHER.GAME_START_BUTTONS.join(', ');
         const buttons = Array.from(document.querySelectorAll(query + ', .popup__link--confirm'));
 
@@ -193,7 +336,6 @@ function handleLauncherPage(settings: AppSettings) {
         return false;
     };
 
-    // Attempt immediately
     if (!checkAndClick()) {
         console.log('Loop not found immediately. Starting observer...');
         const observer = new MutationObserver((_mutations, obs) => {
@@ -205,13 +347,9 @@ function handleLauncherPage(settings: AppSettings) {
 
 function startPolling(settings: AppSettings) {
     let attempts = 0;
-    const maxAttempts = 75; // 15 seconds (200ms * 75)
+    const maxAttempts = 75; // 15 seconds
 
     const interval = setInterval(() => {
-        // Removed document.hasFocus() check to ensure background execution works
-
-        // 1. Modal Blocker Check (REMOVED)
-
         attempts++;
         const startBtn = document.querySelector(SELECTORS.MAIN.BTN_GAME_START) as HTMLElement;
 
@@ -222,12 +360,10 @@ function startPolling(settings: AppSettings) {
             console.log('Start Button clicked. Stopping polling immediately.');
             clearInterval(interval);
 
-            // [FIX] Perform URL Cleanup Locally if not closing tab
-            // This avoids "Receiving end does not exist" errors blocking the cleanup
+            // Local Cleanup for POE2
             if (!settings.closeTab) {
                 console.log('[Content] Local Cleanup: Removing #autoStart from URL...');
                 history.replaceState(null, '', window.location.pathname + window.location.search);
-                // Fallback clear if replaceState acts up
                 setTimeout(() => {
                     if (window.location.hash.includes('autoStart')) {
                         window.location.hash = '';
@@ -258,7 +394,6 @@ function startPolling(settings: AppSettings) {
 }
 
 function manageIntroModal(preferTodayClose: boolean) {
-    // Check for existing cookie first to avoid redundant operations and potential site errors
     if (document.cookie.includes('POE2_INTRO_MODAL=1')) {
         console.log('Intro Modal cookie already present. Skipping modal logic.');
         return;
@@ -286,19 +421,15 @@ function manageIntroModal(preferTodayClose: boolean) {
 
         if ((container as HTMLElement).offsetParent === null) return false;
 
-        // Strategy A: "Today Close" Logic (Only if preferred)
         if (preferTodayClose) {
             const todayBtn = container.querySelector(SELECTORS.MAIN.BTN_TODAY_CLOSE);
             if (todayBtn) {
                 console.log('Found "Today Close" button. Clicking...');
                 safeClick(todayBtn as HTMLElement);
                 return true;
-            } else {
-                console.log('"Today Close" preferred but button not found. Trying invalid fallback? No, sticking to X.');
             }
         }
 
-        // Strategy B: Click "X" (Default or Fallback)
         const closeBtn = container.querySelector(SELECTORS.MAIN.BTN_CLOSE_X);
         if (closeBtn) {
             console.log('Found "Close" button (X). Clicking...');
@@ -323,29 +454,22 @@ function manageIntroModal(preferTodayClose: boolean) {
 function safeClick(element: HTMLElement) {
     if (!element) return;
 
-    // 1. 특수 링크 감지 (javascript:...)
-    // 'javascript:'로 시작하는 링크를 직접 click()하면 CSP(보안 정책)에 의해 차단될 수 있습니다.
-    // 따라서 마우스 이벤트를 직접 생성하여 디스패치하는 우회 방법을 사용합니다.
     if (element instanceof HTMLAnchorElement && element.href.toLowerCase().startsWith('javascript:')) {
         const event = new MouseEvent('click', {
             view: window,
             bubbles: true,
             cancelable: true
         });
-        event.preventDefault(); // 중요: 브라우저의 기본 이동 동작을 막고, 스크립트만 실행되도록 합니다.
+        event.preventDefault();
         element.dispatchEvent(event);
         return;
     }
 
-    // 2. 일반 요소 (Button, Div 등)
-    // 호환성이 가장 좋은 표준 .click() 메서드를 사용합니다. (Native Click)
     if (typeof element.click === 'function') {
         element.click();
         return;
     }
 
-    // 3. 최후의 수단 (Fallback)
-    // click() 함수가 없는 일부 요소(SVG 등)를 위해 강제로 마우스 이벤트를 발생시킵니다.
     const event = new MouseEvent('click', {
         view: window,
         bubbles: true,
