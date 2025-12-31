@@ -77,6 +77,20 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
     - 좌측 상단 **"압축해제된 확장 프로그램을 로드합니다"** 클릭
     - 프로젝트 폴더 내의 `dist` 폴더 선택
 
+### 코드 스타일 및 컨트리뷰션 가이드
+
+이 프로젝트는 코드 품질 유지를 위해 **ESLint**, **Prettier**, **Husky**를 사용합니다.
+
+- **자동 포맷팅 (Git Hooks)**: 커밋 시(`git commit`) 자동으로 변경된 파일(Staged)에 대해 포맷팅 및 검사를 수행합니다.
+- **수동 포맷팅**:
+    ```bash
+    npm run format # 전체 파일 정리 (Prettier)
+    npm run lint   # 코드 규칙 검사 (ESLint)
+    ```
+- **VS Code 설정 (자동 적용)**:
+    - 프로젝트에 포함된 `.vscode/settings.json`을 통해 **저장 시 자동 포맷팅(Format On Save)**이 기본으로 적용됩니다.
+    - 별도의 설정 없이 파일을 저장하기만 하면 코드가 자동으로 정리됩니다.
+
 ## 지원 및 문의
 
 - [자주 묻는 질문 (FAQ)](docs/FAQ.md)
