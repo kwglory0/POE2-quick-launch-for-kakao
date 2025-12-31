@@ -47,7 +47,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     closeTab: false,
     closePopup: false,
     pluginDisable: false,
-    patchNoteCount: 3,
+    patchNoteCount: 4,
     cachedPatchNotes: { poe: [], poe2: [] },
     cachedNotices: [],
     cachedThemeColors: {},

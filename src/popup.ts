@@ -25,12 +25,14 @@ const logoPoe2 = document.getElementById('logoPoe2') as HTMLImageElement;
 
 // Tab Elements
 const tabBtnPatchNotes = document.getElementById('tabBtnPatchNotes') as HTMLButtonElement;
+const tabBtnHelp = document.getElementById('tabBtnHelp') as HTMLButtonElement;
 const tabBtnSettings = document.getElementById('tabBtnSettings') as HTMLButtonElement;
 const tabPanelPatchNotes = document.getElementById('tabPanelPatchNotes') as HTMLDivElement;
+const tabPanelHelp = document.getElementById('tabPanelHelp') as HTMLDivElement;
 const tabPanelSettings = document.getElementById('tabPanelSettings') as HTMLDivElement;
 
 let selectedGame: GameType = 'poe2'; // Default local state, will be updated from storage
-let patchNoteCount = 3;
+let patchNoteCount = DEFAULT_SETTINGS.patchNoteCount;
 let cachedPatchNotes: Record<GameType, PatchNote[]> = { poe: [], poe2: [] };
 let cachedNotices: Notice[] = [];
 let cachedThemeColors: Record<string, ThemeColors> = {};
@@ -370,18 +372,23 @@ async function updateGameUI(game: GameType) {
 //     }
 // }
 
-function switchTab(targetTab: 'patchNotes' | 'settings') {
+function switchTab(targetTab: 'patchNotes' | 'settings' | 'help') {
     // 1. Identify current state
     const isPatchNotesActive = tabPanelPatchNotes.classList.contains('active');
     const isSettingsActive = tabPanelSettings.classList.contains('active');
+    const isHelpActive = tabPanelHelp.classList.contains('active');
 
     // 2. Check if we are closing the current tab (Fold)
-    if ((targetTab === 'patchNotes' && isPatchNotesActive) || (targetTab === 'settings' && isSettingsActive)) {
+    if ((targetTab === 'patchNotes' && isPatchNotesActive) ||
+        (targetTab === 'settings' && isSettingsActive) ||
+        (targetTab === 'help' && isHelpActive)) {
         // Close everything
         tabPanelPatchNotes.classList.remove('active');
         tabPanelSettings.classList.remove('active');
+        tabPanelHelp.classList.remove('active');
         tabBtnPatchNotes.classList.remove('active');
         tabBtnSettings.classList.remove('active');
+        tabBtnHelp.classList.remove('active');
         return;
     }
 
@@ -389,13 +396,18 @@ function switchTab(targetTab: 'patchNotes' | 'settings') {
     // Reset all first (Triggers exit change for active one)
     tabPanelPatchNotes.classList.remove('active');
     tabPanelSettings.classList.remove('active');
+    tabPanelHelp.classList.remove('active');
     tabBtnPatchNotes.classList.remove('active');
     tabBtnSettings.classList.remove('active');
+    tabBtnHelp.classList.remove('active');
 
     // Activate Target (Triggers enter animation)
     if (targetTab === 'patchNotes') {
         tabPanelPatchNotes.classList.add('active');
         tabBtnPatchNotes.classList.add('active');
+    } else if (targetTab === 'help') {
+        tabPanelHelp.classList.add('active');
+        tabBtnHelp.classList.add('active');
     } else {
         tabPanelSettings.classList.add('active');
         tabBtnSettings.classList.add('active');
@@ -403,6 +415,7 @@ function switchTab(targetTab: 'patchNotes' | 'settings') {
 }
 
 if (tabBtnPatchNotes) tabBtnPatchNotes.addEventListener('click', () => switchTab('patchNotes'));
+if (tabBtnHelp) tabBtnHelp.addEventListener('click', () => switchTab('help'));
 if (tabBtnSettings) tabBtnSettings.addEventListener('click', () => switchTab('settings'));
 
 logoPoe.addEventListener('click', () => {
