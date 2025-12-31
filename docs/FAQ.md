@@ -31,16 +31,19 @@
 아래 브라우저별 해결 방법을 참고하여 **팝업 및 리디렉션**을 허용할 수 있습니다.
 
 #### 1. Brave (브레이브)
-주소창 우측의 **사자 아이콘(Brave Shields)** 클릭 -> '차단 설정' 확인
+주소창 우측의 **'팝업 차단됨' 아이콘** 클릭 -> **'항상 허용'** 선택 후 완료
+
 ![Brave Popup Blocker](./popup-blocker-brave.png)
 
 #### 2. Chrome / Edge (크롬, 엣지)
 주소창 우측의 **'팝업 차단됨' 아이콘** 클릭 -> **'항상 허용'** 선택 후 완료
+
 ![Chrome Popup Blocker](./popup-blocker-chrome.png)
 ![Edge Popup Blocker](./popup-blocker-edge.png)
 
 #### 3. Firefox (파이어폭스)
 주소창 좌측의 **방패 아이콘** 또는 알림 줄의 **'옵션'** 클릭 -> **'팝업 허용'** 선택
+
 ![Firefox Popup Blocker](./popup-blocker-firefox.png)
 
 ---
