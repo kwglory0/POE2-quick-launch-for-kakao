@@ -26,57 +26,34 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
         }
     }
 
-    if (request.action === 'launcherGameStartClicked') {
-        const shouldCloseMainPage = request.shouldCloseMainPage;
-        console.log(`Background received "Game Start Clicked". Close Main Page? ${shouldCloseMainPage}`);
-        sendResponse('ok');
+    if (request.action === 'registerMainTab') {
+        if (sender.tab && sender.tab.id) {
+            chrome.storage.session.set({ 'mainGameTabId': sender.tab.id });
+            console.log('[Background] Registered Main Game Tab ID:', sender.tab.id);
+        }
+    } else if (request.action === 'closeMainTab') {
+        chrome.storage.session.get(['mainGameTabId'], (result) => {
+            const tabId = result['mainGameTabId'] as number | undefined;
+            if (tabId) {
+                console.log('[Background] Received closeMainTab signal. Closing tab in 1s:', tabId);
 
-        // 1. Wait 5 seconds (Safety for UAC / Custom Protocol)
-        // This timer runs in the Background, so it persists even if the Launcher Tab closes instantly.
-        setTimeout(() => {
-            console.log('5s Safety Timer finished. Proceeding to cleanup...');
+                setTimeout(() => {
+                    chrome.tabs.remove(tabId, () => {
+                        const err = chrome.runtime.lastError;
+                        if (err) console.warn('[Background] Failed to close tab (maybe already closed):', err);
+                        else console.log('[Background] Main Game Tab closed successfully.');
 
-            // 2. Close the Launcher Popup (Conditional) - REMOVED
-            // User feedback: Launcher pages (gamestart, pubsvc) close automatically.
-            // We should not force close them here to avoid errors or unintended behavior.
-            if (sender.tab && sender.tab.id) {
-                console.log('Processed Game Start signal from tab:', sender.tab.id);
+                        // Cleanup session storage
+                        chrome.storage.session.remove('mainGameTabId');
+                    });
+                }, 1000);
+            } else {
+                console.warn('[Background] received closeMainTab but no ID found in session.');
             }
-
-            // 3. Handle Main Page (Close OR Cleanup)
-            setTimeout(() => {
-                chrome.tabs.query({ url: "*://*.game.daum.net/*" }, (tabs) => {
-                    const mainPageTabs = tabs.filter(t => t.url &&
-                        (t.url.includes('pathofexile2.game.daum.net') || t.url.includes('poe.game.daum.net')) &&
-                        t.url.includes('#autoStart')
-                    );
-                    const tabIds = mainPageTabs.map(t => t.id).filter((id): id is number => id !== undefined);
-
-                    if (tabIds.length === 0) {
-                        console.log('[Background] No Main Page tabs found.');
-                        return;
-                    }
-
-                    if (shouldCloseMainPage) {
-                        console.log('[Background] Closing Main Page tab(s):', tabIds);
-                        chrome.tabs.remove(tabIds);
-                    } else {
-                        console.log('[Background] Auto Close disabled. Sending "cleanupUrl" signal to Main Page:', tabIds);
-                        tabIds.forEach(id => {
-                            chrome.tabs.sendMessage(id, { action: 'cleanupUrl' }, (response) => {
-                                const lastError = chrome.runtime.lastError;
-                                if (lastError) {
-                                    // Common error if tab is closed or refreshing. Lower severity to warn.
-                                    console.warn(`[Background] Cleanup signal failed for tab ${id} (likely closed/busy):`, lastError.message || lastError);
-                                } else {
-                                    console.log(`[Background] Cleanup signal delivered to tab ${id}. Response:`, response);
-                                }
-                            });
-                        });
-                    }
-                });
-            }, 1000);
-        }, 5000);
+        });
+    } else if (request.action === 'launcherGameStartClicked') {
+        // Deprecated action kept potentially for logging or if needed, but logic removed
+        console.log(`[Background] Deprecated 'launcherGameStartClicked' received. No action taken.`);
     } else if (request.action === 'checkAutoSequence') {
         chrome.storage.session.get(['isAutoSequence'], (result) => {
             sendResponse({ isAutoSequence: result['isAutoSequence'] });

@@ -64,6 +64,10 @@ const Poe2MainHandler: PageHandler = {
 
         if (isAutoStart) {
             console.log('Auto Start triggered on Homepage.');
+
+            // Register this tab as the Main Game Tab for later closing
+            chrome.runtime.sendMessage({ action: 'registerMainTab' });
+
             chrome.runtime.sendMessage({ action: 'setAutoSequence', value: true });
             startPolling(settings);
         }
@@ -228,13 +232,16 @@ function handlePoeAutoStart(settings: AppSettings) {
     const pollForButton = setInterval(() => {
         const startBtn = document.querySelector(SELECTORS.POE.BTN_GAME_START) as HTMLElement;
         if (startBtn) {
+            // Unconditional Cleanup for POE1 as well (requested generally)
+            // Perform BEFORE click to ensure visual update
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+            
             console.log('Found POE Start Button, clicking...');
             safeClick(startBtn);
             clearInterval(pollForButton);
 
-            if (!settings.closeTab) {
-                history.replaceState(null, '', window.location.pathname + window.location.search);
-            }
+            // Register this tab as Main Tab
+            chrome.runtime.sendMessage({ action: 'registerMainTab' });
 
             chrome.runtime.sendMessage({
                 action: 'launcherGameStartClicked',
@@ -316,6 +323,20 @@ function performLauncherPageLogic(settings: AppSettings) {
             safeClick(gameStartBtn as HTMLElement);
 
             console.log('Launcher Game Start clicked. Sending signal to Background...');
+
+            // If this is the completion handler context (checked via path usually, but safe to send signal here if we want completion logic)
+            // Actually, performLauncherPageLogic is shared.
+            // But the user asked for LauncherCompletionHandler to send the signal.
+            // LauncherCompletionHandler calls this function.
+            // Let's check if we are in completion context to send 'closeMainTab'
+
+            if (window.location.pathname.includes('/completed.html')) {
+                console.log('Completion Page detected. Requesting to close Main Tab...');
+                if (settings.closeTab) {
+                    chrome.runtime.sendMessage({ action: 'closeMainTab' });
+                }
+            }
+
             chrome.runtime.sendMessage({
                 action: 'launcherGameStartClicked',
                 shouldCloseMainPage: settings.closeTab
@@ -351,22 +372,20 @@ function startPolling(settings: AppSettings) {
         const startBtn = document.querySelector(SELECTORS.MAIN.BTN_GAME_START) as HTMLElement;
 
         if (startBtn) {
+            // Unconditional Local Cleanup (User Request) - BEFORE click
+            console.log('[Content] Local Cleanup: Removing #autoStart from URL (Unconditional, pre-click)...');
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+            try {
+                if (window.location.hash.includes('autoStart')) {
+                     window.location.hash = '';
+                }
+            } catch (e) { /* ignore */ }
+
             console.log(`[Attempt ${attempts}] Found Start Button, clicking...`);
             safeClick(startBtn);
 
             console.log('Start Button clicked. Stopping polling immediately.');
             clearInterval(interval);
-
-            // Local Cleanup for POE2
-            if (!settings.closeTab) {
-                console.log('[Content] Local Cleanup: Removing #autoStart from URL...');
-                history.replaceState(null, '', window.location.pathname + window.location.search);
-                setTimeout(() => {
-                    if (window.location.hash.includes('autoStart')) {
-                        window.location.hash = '';
-                    }
-                }, 100);
-            }
 
             console.log('Sending game start signal from Main Page...');
             chrome.runtime.sendMessage({
@@ -475,27 +494,7 @@ function safeClick(element: HTMLElement) {
     element.dispatchEvent(event);
 }
 
-console.log('Registering cleanupUrl listener...');
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-    if (request.action === 'cleanupUrl') {
-        console.log('[Content] Received cleanup signal. Current Hash:', window.location.hash);
 
-        if (window.location.hash.includes('#autoStart')) {
-            console.log('[Content] Removing #autoStart from URL via replaceState...');
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-
-            setTimeout(() => {
-                if (window.location.hash.includes('autoStart')) {
-                    console.log('[Content] replaceState failed? Forcing window.location.hash clear.');
-                    window.location.hash = '';
-                } else {
-                    console.log('[Content] URL Cleanup Confirmed. Hash is clean.');
-                }
-            }, 50);
-        }
-        sendResponse('cleaned');
-    }
-});
 
 // Entry Point
 loadSettings().then((settings) => {
