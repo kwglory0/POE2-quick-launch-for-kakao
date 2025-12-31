@@ -36,6 +36,7 @@ jobs:
         run: |
           npm ci
           npm run zip
+          npm run zip:firefox
 
       - name: Upload release
         uses: softprops/action-gh-release@v1

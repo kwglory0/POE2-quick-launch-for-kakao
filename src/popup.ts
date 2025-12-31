@@ -1,5 +1,5 @@
 // popup.ts
-import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS, Notice, ThemeColors, AppSettings } from './storage';
+import { loadSettings, saveSetting, STORAGE_KEYS, GameType, PatchNote, DEFAULT_SETTINGS, Notice, ThemeColors, AppSettings, BrowserType } from './storage';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
 import { fetchNotices } from './notice';
 import { SETTINGS_CONFIG, SettingItem } from './settings';
@@ -147,11 +147,32 @@ function updateMoreButton(game: GameType) {
     }
 }
 
+let currentBrowser: BrowserType = 'chrome';
+
+async function detectBrowser(): Promise<BrowserType> {
+    const ua = navigator.userAgent;
+    if (ua.includes("Firefox")) return 'firefox';
+    if (ua.includes("Edg")) return 'edge';
+    // Brave Detection (Async)
+    if ((navigator as any).brave && await (navigator as any).brave.isBrave()) {
+        return 'brave';
+    }
+    return 'chrome';
+}
+
 function renderNotices(notices: Notice[], game: GameType) {
     if (!noticeContainer) return;
     noticeContainer.innerHTML = '';
 
-    const currentNotices = notices.filter(n => n.targetGame.includes(game));
+    const currentNotices = notices.filter(n => {
+        // 1. Check Game Target
+        const isGameMatch = n.targetGame.includes(game);
+        if (!isGameMatch) return false;
+
+        // 2. Check Browser Target (Optional, default to all)
+        if (!n.targetBrowser || n.targetBrowser.length === 0) return true;
+        return n.targetBrowser.includes(currentBrowser);
+    });
 
     currentNotices.forEach(notice => {
         const a = document.createElement('a');
@@ -550,6 +571,9 @@ launchBtn.addEventListener('click', async (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Detect Browser first
+    currentBrowser = await detectBrowser();
+
     const settings = await loadSettings();
 
     // 1. Initial Render of Settings

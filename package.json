@@ -29,7 +29,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "zip": "npm run build && node scripts/make-zip.js"
+    "zip": "npm run build && node scripts/make-zip.js",
+    "zip:firefox": "npm run build && node scripts/make-zip-firefox.js"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.28",

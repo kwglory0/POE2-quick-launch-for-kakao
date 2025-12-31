@@ -7,10 +7,13 @@ export interface PatchNote {
     isNew?: boolean;
 }
 
+export type BrowserType = 'chrome' | 'firefox' | 'edge' | 'brave';
+
 export interface Notice {
     title: string;
     link: string;
     targetGame: GameType[];
+    targetBrowser?: BrowserType[]; // Optional, defaults to all if undefined
 }
 
 export interface ThemeColors {
