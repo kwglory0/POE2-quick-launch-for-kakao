@@ -62,10 +62,18 @@ function handlePoePage(settings: AppSettings) {
                 safeClick(startBtn);
                 clearInterval(pollForButton);
 
+                // [FIX] Local Cleanup for POE1 as well
+                if (!settings.closeTab) {
+                    history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+
                 // Send signal to potentially close tab if configured (reuse launcher signal)
                 chrome.runtime.sendMessage({
                     action: 'launcherGameStartClicked',
                     shouldCloseMainPage: settings.closeTab
+                }, () => {
+                    // Suppress "Receiving end does not exist" error
+                    if (chrome.runtime.lastError) { /* ignore */ }
                 });
             }
         }, 500);
@@ -213,6 +221,19 @@ function startPolling(settings: AppSettings) {
 
             console.log('Start Button clicked. Stopping polling immediately.');
             clearInterval(interval);
+
+            // [FIX] Perform URL Cleanup Locally if not closing tab
+            // This avoids "Receiving end does not exist" errors blocking the cleanup
+            if (!settings.closeTab) {
+                console.log('[Content] Local Cleanup: Removing #autoStart from URL...');
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+                // Fallback clear if replaceState acts up
+                setTimeout(() => {
+                    if (window.location.hash.includes('autoStart')) {
+                        window.location.hash = '';
+                    }
+                }, 100);
+            }
 
             console.log('Sending game start signal from Main Page...');
             chrome.runtime.sendMessage({

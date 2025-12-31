@@ -25,9 +25,20 @@ const fileName = `${packageName}-v${version}-firefox.zip`;
 
 console.log(`Creating Firefox zip file: ${fileName}`);
 
-// 1. Patch manifest.json for Firefox
-console.log('Patching dist/manifest.json for Firefox...');
-const manifestPath = path.join(dir, 'dist', 'manifest.json');
+// 1. Prepare Firefox distribution directory
+const distDir = path.join(dir, 'dist');
+const firefoxDistDir = path.join(dir, 'dist-firefox');
+
+console.log(`Preparing Firefox build directory: ${firefoxDistDir}`);
+
+if (fs.existsSync(firefoxDistDir)) {
+    fs.rmSync(firefoxDistDir, { recursive: true, force: true });
+}
+fs.cpSync(distDir, firefoxDistDir, { recursive: true });
+
+// 2. Patch manifest.json for Firefox
+console.log('Patching dist-firefox/manifest.json for Firefox...');
+const manifestPath = path.join(firefoxDistDir, 'manifest.json');
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
 // Inject browser_specific_settings for Gecko (Firefox)
@@ -39,11 +50,15 @@ manifest.browser_specific_settings = {
 };
 
 // Convert background.service_worker to background.scripts for Firefox compatibility
+// Firefox (as of current stable) may still require this or prefers Event Pages for stability.
 if (manifest.background && manifest.background.service_worker) {
     console.log('Converting background.service_worker to background.scripts for Firefox...');
     manifest.background.scripts = [manifest.background.service_worker];
     delete manifest.background.service_worker;
-    delete manifest.background.type; // 'type': 'module' is implied or different in scripts
+    // Note: We MUST keep 'type': 'module' because Vite bundles this as an ES Module.
+    // Firefox supports type: 'module' with background.scripts (or at least tolerates it for loading).
+    // If we delete it, it tries to load as Classic Script and fails on 'import/export'.
+    // delete manifest.background.type; 
 }
 
 // Remove 'use_dynamic_url' from web_accessible_resources (Firefox doesn't support it)
@@ -62,17 +77,15 @@ if (manifest.web_accessible_resources) {
 fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
 console.log('Manifest patched successfully.');
 
-// 2. Zip it
-// To ensure manifest.json is at the root of the zip, we must zip the *contents* of dist, not the dist folder itself.
-// We also avoid using "*" glob to ensure Windows compatibility by listing files programmatically.
-const distDir = path.join(dir, 'dist');
-const filesToZip = fs.readdirSync(distDir).map(f => `"${f}"`).join(' '); // Add quotes for safety
+// 3. Zip it
+// Zip contents of dist-firefox
+const filesToZip = fs.readdirSync(firefoxDistDir).map(f => `"${f}"`).join(' '); // Add quotes for safety
 
 const command = `npx bestzip ../${fileName} ${filesToZip}`;
 
-console.log(`Executing in dist/: ${command}`);
+console.log(`Executing in dist-firefox/: ${command}`);
 
-exec(command, { cwd: distDir }, (error, stdout, stderr) => {
+exec(command, { cwd: firefoxDistDir }, (error, stdout, stderr) => {
     if (error) {
         console.error(`Error creating zip: ${error.message}`);
         process.exit(1);
