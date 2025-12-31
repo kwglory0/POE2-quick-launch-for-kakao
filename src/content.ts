@@ -3,10 +3,7 @@ import { loadSettings, AppSettings } from './storage';
 
 console.log('POE / POE2 Quick Launch Content Script Loaded');
 
-// Entry Point
-loadSettings().then((settings) => {
-    dispatchPageLogic(settings);
-});
+
 
 // Listen for Hash Changes (Auto Start Re-trigger)
 window.addEventListener('hashchange', async () => {
@@ -498,6 +495,11 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         }
         sendResponse('cleaned');
     }
+});
+
+// Entry Point
+loadSettings().then((settings) => {
+    dispatchPageLogic(settings);
 });
 
 export { };
