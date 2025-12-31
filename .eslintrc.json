@@ -1,15 +1,8 @@
 {
     "root": true,
     "parser": "@typescript-eslint/parser",
-    "plugins": [
-        "@typescript-eslint",
-        "import"
-    ],
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
-    ],
+    "plugins": ["@typescript-eslint", "import"],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
     "rules": {
         "import/order": [
             "error",
@@ -18,11 +11,7 @@
                     "builtin",
                     "external",
                     "internal",
-                    [
-                        "parent",
-                        "sibling",
-                        "index"
-                    ],
+                    ["parent", "sibling", "index"],
                     "object",
                     "type"
                 ],

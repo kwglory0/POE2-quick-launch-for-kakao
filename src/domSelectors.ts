@@ -32,19 +32,16 @@ export const SELECTORS = {
         // Potential "Game Start" buttons.
         // We check these in order or by checking availability.
         GAME_START_BUTTONS: [
-            '#gameStart',           // Standard ID
-            '.btn-start-game',      // Standard Class
-            'a',                    // Fallback to searching all links...
-            'button',               // ...and buttons
-            'span.btn_g',           // Generic Daum buttons
+            '#gameStart', // Standard ID
+            '.btn-start-game', // Standard Class
+            'a', // Fallback to searching all links...
+            'button', // ...and buttons
+            'span.btn_g', // Generic Daum buttons
             '.popup__link--confirm' // Sometimes confirm buttons launch game?
         ],
 
         // Text content to identify "Login Required" popup
-        LOGIN_REQUIRED_TEXTS: [
-            '로그인이 필요한 서비스',
-            '로그인 하시겠습니까'
-        ],
+        LOGIN_REQUIRED_TEXTS: ['로그인이 필요한 서비스', '로그인 하시겠습니까'],
 
         // "Confirm" button in popups (like Login Required)
         BTN_CONFIRM: '.popup__link--confirm'
@@ -55,13 +52,7 @@ export const SELECTORS = {
     // -------------------------------------------------------------------------
     SECURITY: {
         // Candidates for the "Confirm" or "Done" button
-        CONFIRM_BUTTONS: [
-            'a',
-            'button',
-            'span.btn_g',
-            '.popup__link--confirm',
-            '.btn-confirm'
-        ],
+        CONFIRM_BUTTONS: ['a', 'button', 'span.btn_g', '.popup__link--confirm', '.btn-confirm'],
 
         // Specific class for Designated PC confirm button
         BTN_DESIGNATED_CONFIRM: '.btn-confirm',

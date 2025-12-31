@@ -9,6 +9,7 @@
 <!-- prettier-ignore-end -->
 
 <!-- Badges -->
+
 [chrome-web-store-version-badge]: https://img.shields.io/chrome-web-store/v/cpghdafmhbkggpehfhcdicaoponodbje?label=Chrome%20Web%20Store&logo=chromewebstore&style=for-the-badge&color=success
 [chrome-web-store-users-badge]: https://img.shields.io/chrome-web-store/users/cpghdafmhbkggpehfhcdicaoponodbje?logo=chromewebstore&style=for-the-badge&color=success
 [github-release-badge]: https://img.shields.io/github/v/release/NERDHEAD-lab/POE2-quick-launch-for-kakao?logo=github
@@ -18,6 +19,7 @@
 [buy-me-a-coffee-badge]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-yellow?logo=buymeacoffee&logoColor=white
 
 <!-- Links -->
+
 [chrome-web-store-link]: https://chromewebstore.google.com/detail/cpghdafmhbkggpehfhcdicaoponodbje?utm_source=item-share-cb
 [github-release-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/releases
 [build-status-link]: https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/actions
@@ -25,8 +27,8 @@
 [github-sponsors-link]: https://github.com/sponsors/NERDHEAD-lab
 [buy-me-a-coffee-link]: https://coff.ee/nerdhead_lab
 
-
 # POE2 Quick Launch for Kakao
+
 ![Demo](docs/poe2_autoStart_test_preview.gif)
 
 Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하는 크롬 확장 프로그램입니다.
@@ -52,6 +54,7 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
 ### 설치 및 로드 방법
 
 1. **프로젝트 클론 및 의존성 설치**:
+
     ```bash
     git clone https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao.git
     cd POE2-quick-launch-for-kakao
@@ -59,11 +62,13 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
     ```
 
 2. **빌드**:
+
     ```bash
     npm run build
     # 또는 변경 사항 실시간 감지 (개발 모드)
     npm run dev
     ```
+
     위 명령어를 실행하면 `dist` 폴더에 확장 프로그램 파일이 생성됩니다.
 
 3. **브라우저에 확장 프로그램 로드**:

@@ -1,51 +1,51 @@
 name: 🐛 오류 수정 요청 (Bug Report)
 description: 프로그램 오류 및 오작동 신고
-labels: ["bug"]
+labels: ['bug']
 body:
-  - type: markdown
-    attributes:
-      value: |
-        프로그램 사용 중 발생한 오류를 제보합니다.
-        제보해주신 내용은 프로그램 개선을 위해 검토 후 조치될 예정입니다.
+    - type: markdown
+      attributes:
+          value: |
+              프로그램 사용 중 발생한 오류를 제보합니다.
+              제보해주신 내용은 프로그램 개선을 위해 검토 후 조치될 예정입니다.
 
-  - type: dropdown
-    id: browser
-    attributes:
-      label: 사용 브라우저
-      description: 문제 발생 시 사용 중이던 웹 브라우저를 선택해 주십시오.
-      options:
-        - Chrome
-        - Whale (네이버 웨일)
-        - Edge
-        - Brave
-        - Firefox
-        - Other (기타)
-    validations:
-      required: true
+    - type: dropdown
+      id: browser
+      attributes:
+          label: 사용 브라우저
+          description: 문제 발생 시 사용 중이던 웹 브라우저를 선택해 주십시오.
+          options:
+              - Chrome
+              - Whale (네이버 웨일)
+              - Edge
+              - Brave
+              - Firefox
+              - Other (기타)
+      validations:
+          required: true
 
-  - type: textarea
-    id: settings
-    attributes:
-      label: 현재 설정 상태 확인
-      description: |
-        현재 적용 중인 주요 설정 옵션을 기재해 주십시오. (설정창 스크린샷 첨부 가능)
-        *설정 환경에 따라 오류가 다르게 발생할 수 있습니다.*
-      placeholder: |
-        (예시)
-        - 탭 닫기: 사용
-        - 팝업 닫기: 미사용
-        - 기타 활성화된 옵션 등
-    validations:
-      required: true
+    - type: textarea
+      id: settings
+      attributes:
+          label: 현재 설정 상태 확인
+          description: |
+              현재 적용 중인 주요 설정 옵션을 기재해 주십시오. (설정창 스크린샷 첨부 가능)
+              *설정 환경에 따라 오류가 다르게 발생할 수 있습니다.*
+          placeholder: |
+              (예시)
+              - 탭 닫기: 사용
+              - 팝업 닫기: 미사용
+              - 기타 활성화된 옵션 등
+      validations:
+          required: true
 
-  - type: textarea
-    id: description
-    attributes:
-      label: 증상 및 재현 경로 (Symptoms)
-      description: 발생한 문제 현상과 해당 현상이 발생하게 된 경위(순서)를 상세히 기재해 주십시오.
-      placeholder: |
-        1. 
-        2. 
-        ...
-    validations:
-      required: true
+    - type: textarea
+      id: description
+      attributes:
+          label: 증상 및 재현 경로 (Symptoms)
+          description: 발생한 문제 현상과 해당 현상이 발생하게 된 경위(순서)를 상세히 기재해 주십시오.
+          placeholder: |
+              1. 
+              2. 
+              ...
+      validations:
+          required: true

@@ -4,7 +4,10 @@
 export function safeClick(element: HTMLElement) {
     if (!element) return;
 
-    if (element instanceof HTMLAnchorElement && element.href.toLowerCase().startsWith('javascript:')) {
+    if (
+        element instanceof HTMLAnchorElement &&
+        element.href.toLowerCase().startsWith('javascript:')
+    ) {
         const event = new MouseEvent('click', {
             view: window,
             bubbles: true,
@@ -40,7 +43,10 @@ export function hasText(element: HTMLElement, text: string): boolean {
  * @param checkFn A function that returns true if the target was found and acted upon.
  * @param timeoutMs Max duration to observe (default 10000ms).
  */
-export function observeAndInteract(checkFn: (obs?: MutationObserver) => boolean, timeoutMs: number = 10000) {
+export function observeAndInteract(
+    checkFn: (obs?: MutationObserver) => boolean,
+    timeoutMs: number = 10000
+) {
     // 1. Try immediately
     if (checkFn()) return;
 
@@ -49,7 +55,7 @@ export function observeAndInteract(checkFn: (obs?: MutationObserver) => boolean,
     // 2. Start Observer
     const observer = new MutationObserver((_mutations, obs) => {
         if (checkFn(obs)) {
-            // checkFn is responsible for disconnecting if successful, 
+            // checkFn is responsible for disconnecting if successful,
             // but we can ensure it here if checkFn returns true?
             // Usually checkFn calls obs.disconnect() to stop immediately.
             // But to be safe, we can disconnect here too if returned true.

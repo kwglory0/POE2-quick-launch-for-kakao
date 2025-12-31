@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
 
     if (request.action === 'registerMainTab') {
         if (sender.tab && sender.tab.id) {
-            chrome.storage.session.set({ 'mainGameTabId': sender.tab.id });
+            chrome.storage.session.set({ mainGameTabId: sender.tab.id });
             console.log('[Background] Registered Main Game Tab ID:', sender.tab.id);
         }
     } else if (request.action === 'closeMainTab') {
@@ -43,7 +43,11 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
             setTimeout(() => {
                 chrome.tabs.remove(tabId, () => {
                     const err = chrome.runtime.lastError;
-                    if (err) console.warn('[Background] Failed to close tab (maybe already closed):', err);
+                    if (err)
+                        console.warn(
+                            '[Background] Failed to close tab (maybe already closed):',
+                            err
+                        );
                     else console.log('[Background] Main Game Tab closed successfully.');
 
                     // Cleanup session storage
@@ -62,7 +66,7 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
     } else if (request.action === 'setAutoSequence') {
         const val = request.value;
         console.log('[Background] Setting Auto Sequence flag to:', val);
-        chrome.storage.session.set({ 'isAutoSequence': val });
+        chrome.storage.session.set({ isAutoSequence: val });
         sendResponse('ok');
     }
 });

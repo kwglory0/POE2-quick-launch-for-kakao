@@ -22,23 +22,10 @@
     },
     "content_scripts": [
         {
-            "matches": [
-                "*://*.game.daum.net/*",
-                "*://*.daum.net/*",
-                "*://*.kakao.com/*"
-            ],
-            "js": [
-                "src/content.ts"
-            ]
+            "matches": ["*://*.game.daum.net/*", "*://*.daum.net/*", "*://*.kakao.com/*"],
+            "js": ["src/content.ts"]
         }
     ],
-    "host_permissions": [
-        "*://*.game.daum.net/*",
-        "*://*.daum.net/*",
-        "*://*.kakao.com/*"
-    ],
-    "permissions": [
-        "storage",
-        "tabs"
-    ]
+    "host_permissions": ["*://*.game.daum.net/*", "*://*.daum.net/*", "*://*.kakao.com/*"],
+    "permissions": ["storage", "tabs"]
 }

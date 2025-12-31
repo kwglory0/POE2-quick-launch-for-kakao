@@ -2,7 +2,7 @@ import { PatchNote } from './storage';
 
 export const URLS = {
     poe1: 'https://poe.game.daum.net/forum/view-forum/patch-notes',
-    poe2: 'https://poe.game.daum.net/forum/view-forum/patch-notes2',
+    poe2: 'https://poe.game.daum.net/forum/view-forum/patch-notes2'
 };
 
 export async function fetchPatchNotes(game: 'poe1' | 'poe2', limit: number): Promise<PatchNote[]> {
@@ -47,11 +47,16 @@ export async function fetchPatchNotes(game: 'poe1' | 'poe2', limit: number): Pro
 
             return notes;
         } catch (error) {
-            console.warn(`[PatchNotes] Fetch attempt ${attempt} failed for ${game} (${url}):`, error);
+            console.warn(
+                `[PatchNotes] Fetch attempt ${attempt} failed for ${game} (${url}):`,
+                error
+            );
             if (attempt < MAX_RETRIES) {
-                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+                await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
             } else {
-                console.error(`[PatchNotes] All ${MAX_RETRIES} attempts failed for ${game} (${url}).`);
+                console.error(
+                    `[PatchNotes] All ${MAX_RETRIES} attempts failed for ${game} (${url}).`
+                );
                 return [];
             }
         }

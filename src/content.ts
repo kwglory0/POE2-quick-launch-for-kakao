@@ -77,9 +77,17 @@ const LauncherCheckHandler: PageHandler = {
     match: (url) => {
         if (url.hostname !== 'pubsvc.game.daum.net') return false;
         // Check for specific game start pages (poe.html or poe2.html)
-        return url.pathname.includes('/gamestart/poe.html') || url.pathname.includes('/gamestart/poe2.html');
+        return (
+            url.pathname.includes('/gamestart/poe.html') ||
+            url.pathname.includes('/gamestart/poe2.html')
+        );
     },
-    allowedReferrers: ['poe.game.daum.net', 'pathofexile2.game.daum.net', 'logins.daum.net', 'pubsvc.game.daum.net'],
+    allowedReferrers: [
+        'poe.game.daum.net',
+        'pathofexile2.game.daum.net',
+        'logins.daum.net',
+        'pubsvc.game.daum.net'
+    ],
     execute: (settings) => {
         console.log(`[Handler Execute] ${LauncherCheckHandler.description}`);
         performLauncherPageLogic(settings);
@@ -98,8 +106,11 @@ const DaumLoginHandler: PageHandler = {
 
         try {
             const nextUrl = new URL(decodeURIComponent(nextUrlParam)); // Decoded target URL
-            return nextUrl.hostname === 'pubsvc.game.daum.net' &&
-                (nextUrl.pathname.includes('/gamestart/poe.html') || nextUrl.pathname.includes('/gamestart/poe2.html'));
+            return (
+                nextUrl.hostname === 'pubsvc.game.daum.net' &&
+                (nextUrl.pathname.includes('/gamestart/poe.html') ||
+                    nextUrl.pathname.includes('/gamestart/poe2.html'))
+            );
         } catch (e) {
             return false;
         }
@@ -156,7 +167,8 @@ const LauncherCompletionHandler: PageHandler = {
     description: 'Launcher Execution Confirmation Page',
     match: (url) => {
         if (url.hostname !== 'pubsvc.game.daum.net') return false;
-        if (!url.pathname.includes('/securitycenter') || !url.pathname.includes('/completed.html')) return false;
+        if (!url.pathname.includes('/securitycenter') || !url.pathname.includes('/completed.html'))
+            return false;
 
         // Verify gameCode is 'poe' or 'poe2'
         const gameCode = url.searchParams.get('gameCode');
@@ -205,10 +217,12 @@ function dispatchPageLogic(settings: AppSettings) {
             const currentReferrer = document.referrer;
             // Allow empty matching if list exists but is empty (should not happen based on plan)
             // If list exists, referrer must match one of them
-            const isValid = handler.allowedReferrers.some(ref => currentReferrer.includes(ref));
+            const isValid = handler.allowedReferrers.some((ref) => currentReferrer.includes(ref));
 
             if (!isValid) {
-                console.warn(`[Handler Skip] ${handler.name} - Invalid Referrer: "${currentReferrer}"`);
+                console.warn(
+                    `[Handler Skip] ${handler.name} - Invalid Referrer: "${currentReferrer}"`
+                );
                 console.warn(`Allowed: ${JSON.stringify(handler.allowedReferrers)}`);
                 return; // Stop processing since page matched but safety check failed
             }
@@ -240,12 +254,17 @@ function handlePoeAutoStart(settings: AppSettings) {
             // Register this tab as Main Tab
             chrome.runtime.sendMessage({ action: 'registerMainTab' });
 
-            chrome.runtime.sendMessage({
-                action: 'launcherGameStartClicked',
-                shouldCloseMainPage: settings.closeTab
-            }, () => {
-                if (chrome.runtime.lastError) { /* ignore */ }
-            });
+            chrome.runtime.sendMessage(
+                {
+                    action: 'launcherGameStartClicked',
+                    shouldCloseMainPage: settings.closeTab
+                },
+                () => {
+                    if (chrome.runtime.lastError) {
+                        /* ignore */
+                    }
+                }
+            );
         }
     }, 500);
 
@@ -254,10 +273,14 @@ function handlePoeAutoStart(settings: AppSettings) {
 
 function performSecurityPageLogic() {
     observeAndInteract((obs) => {
-        const buttons = Array.from(document.querySelectorAll(SELECTORS.SECURITY.CONFIRM_BUTTONS.join(', ')));
+        const buttons = Array.from(
+            document.querySelectorAll(SELECTORS.SECURITY.CONFIRM_BUTTONS.join(', '))
+        );
 
         // Priority 0: Designated PC "Confirm" Button
-        const designPcBtn = buttons.find(el => el.classList.contains(SELECTORS.SECURITY.BTN_DESIGNATED_CONFIRM.substring(1)));
+        const designPcBtn = buttons.find((el) =>
+            el.classList.contains(SELECTORS.SECURITY.BTN_DESIGNATED_CONFIRM.substring(1))
+        );
         if (designPcBtn) {
             console.log('Found Designated PC Confirm button. Clicking...');
             safeClick(designPcBtn as HTMLElement);
@@ -266,8 +289,11 @@ function performSecurityPageLogic() {
         }
 
         // Priority 1: Generic Confirm (Fallback)
-        const confirmBtn = buttons.find(el => {
-            return el.classList.contains(SELECTORS.SECURITY.BTN_POPUP_CONFIRM.substring(1)) || (el as HTMLElement).innerText?.trim() === '확인';
+        const confirmBtn = buttons.find((el) => {
+            return (
+                el.classList.contains(SELECTORS.SECURITY.BTN_POPUP_CONFIRM.substring(1)) ||
+                (el as HTMLElement).innerText?.trim() === '확인'
+            );
         });
 
         if (confirmBtn) {
@@ -286,10 +312,16 @@ function performLauncherPageLogic(settings: AppSettings) {
         const buttons = Array.from(document.querySelectorAll(query + ', .popup__link--confirm'));
 
         // 1. Check for Login Required Popup
-        if (SELECTORS.LAUNCHER.LOGIN_REQUIRED_TEXTS.some(text => document.body.innerText.includes(text))) {
+        if (
+            SELECTORS.LAUNCHER.LOGIN_REQUIRED_TEXTS.some((text) =>
+                document.body.innerText.includes(text)
+            )
+        ) {
             console.log('Login required popup detected.');
-            const confirmBtn = buttons.find(el =>
-                el.classList.contains(SELECTORS.LAUNCHER.BTN_CONFIRM.substring(1)) || (el as HTMLElement).innerText?.trim() === '확인'
+            const confirmBtn = buttons.find(
+                (el) =>
+                    el.classList.contains(SELECTORS.LAUNCHER.BTN_CONFIRM.substring(1)) ||
+                    (el as HTMLElement).innerText?.trim() === '확인'
             );
 
             if (confirmBtn) {
@@ -302,7 +334,7 @@ function performLauncherPageLogic(settings: AppSettings) {
         }
 
         // 2. Check for "Game Start" Button
-        const gameStartBtn = buttons.find(el => {
+        const gameStartBtn = buttons.find((el) => {
             if (el.id === 'gameStart' || el.classList.contains('btn-start-game')) return true;
             const text = (el as HTMLElement).innerText?.trim();
             return text === '게임시작' || text === 'GAME START';
@@ -323,17 +355,22 @@ function performLauncherPageLogic(settings: AppSettings) {
                 }
             }
 
-            chrome.runtime.sendMessage({
-                action: 'launcherGameStartClicked',
-                shouldCloseMainPage: settings.closeTab
-            }, () => {
-                const err = chrome.runtime.lastError;
-                if (err) {
-                    console.log('Signal sent. (Response lost due to tab close - Expected behavior)');
-                } else {
-                    console.log('Signal sent successfully.');
+            chrome.runtime.sendMessage(
+                {
+                    action: 'launcherGameStartClicked',
+                    shouldCloseMainPage: settings.closeTab
+                },
+                () => {
+                    const err = chrome.runtime.lastError;
+                    if (err) {
+                        console.log(
+                            'Signal sent. (Response lost due to tab close - Expected behavior)'
+                        );
+                    } else {
+                        console.log('Signal sent successfully.');
+                    }
                 }
-            });
+            );
             if (obs) obs.disconnect();
             return true;
         }
@@ -357,7 +394,9 @@ function startPolling(settings: AppSettings) {
                 if (window.location.hash.includes('autoStart')) {
                     window.location.hash = '';
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) {
+                /* ignore */
+            }
 
             console.log(`[Attempt ${attempts}] Found Start Button, clicking...`);
             safeClick(startBtn);
@@ -366,18 +405,22 @@ function startPolling(settings: AppSettings) {
             clearInterval(interval);
 
             console.log('Sending game start signal from Main Page...');
-            chrome.runtime.sendMessage({
-                action: 'launcherGameStartClicked',
-                shouldCloseMainPage: settings.closeTab
-            }, () => {
-                const err = chrome.runtime.lastError;
-                if (err) console.log('Main Page Signal sent (safely ignored error).');
-                else console.log('Main Page Signal sent successfully.');
-            });
+            chrome.runtime.sendMessage(
+                {
+                    action: 'launcherGameStartClicked',
+                    shouldCloseMainPage: settings.closeTab
+                },
+                () => {
+                    const err = chrome.runtime.lastError;
+                    if (err) console.log('Main Page Signal sent (safely ignored error).');
+                    else console.log('Main Page Signal sent successfully.');
+                }
+            );
 
             return;
         } else {
-            if (attempts % 5 === 0) console.log(`[Attempt ${attempts}] Start Button not found yet.`);
+            if (attempts % 5 === 0)
+                console.log(`[Attempt ${attempts}] Start Button not found yet.`);
         }
 
         if (attempts >= maxAttempts) {
@@ -398,7 +441,7 @@ function manageIntroModal(preferTodayClose: boolean) {
     if (preferTodayClose) {
         try {
             if (!document.cookie.includes('POE2_INTRO_MODAL=1')) {
-                document.cookie = "POE2_INTRO_MODAL=1; path=/; max-age=86400";
+                document.cookie = 'POE2_INTRO_MODAL=1; path=/; max-age=86400';
                 console.log('Set POE2_INTRO_MODAL=1 cookie.');
             }
         } catch (e) {
@@ -445,13 +488,9 @@ function manageIntroModal(preferTodayClose: boolean) {
     setTimeout(() => clearInterval(interval), 10000);
 }
 
-
-
-
-
 // Entry Point
 loadSettings().then((settings) => {
     dispatchPageLogic(settings);
 });
 
-export { };
+export {};

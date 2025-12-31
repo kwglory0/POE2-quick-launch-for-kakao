@@ -1,6 +1,14 @@
 import {
-    loadSettings, saveSetting, STORAGE_KEYS, DEFAULT_SETTINGS,
-    GameType, PatchNote, Notice, ThemeColors, AppSettings, BrowserType
+    loadSettings,
+    saveSetting,
+    STORAGE_KEYS,
+    DEFAULT_SETTINGS,
+    GameType,
+    PatchNote,
+    Notice,
+    ThemeColors,
+    AppSettings,
+    BrowserType
 } from './storage';
 import { SETTINGS_CONFIG, SettingItem } from './settings';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
@@ -40,8 +48,6 @@ let cachedPatchNotes: Record<GameType, PatchNote[]> = { poe: [], poe2: [] };
 let cachedNotices: Notice[] = [];
 let cachedThemeColors: Record<string, ThemeColors> = {};
 
-
-
 // Game Configuration
 const GAME_CONFIG = {
     poe: {
@@ -53,7 +59,7 @@ const GAME_CONFIG = {
         fallback: {
             text: '#c8c8c8',
             accent: '#dfcf99', // Gold
-            footer: '#1a1510'   // Dark Brown/Black
+            footer: '#1a1510' // Dark Brown/Black
         }
     },
     poe2: {
@@ -65,7 +71,7 @@ const GAME_CONFIG = {
         fallback: {
             text: '#b5c2b5',
             accent: '#aaddaa', // Mint
-            footer: '#0c150c'  // Dark Green
+            footer: '#0c150c' // Dark Green
         }
     }
 };
@@ -83,10 +89,10 @@ let currentBrowser: BrowserType = 'chrome';
 
 async function detectBrowser(): Promise<BrowserType> {
     const ua = navigator.userAgent;
-    if (ua.includes("Firefox")) return 'firefox';
-    if (ua.includes("Edg")) return 'edge';
+    if (ua.includes('Firefox')) return 'firefox';
+    if (ua.includes('Edg')) return 'edge';
     // Brave Detection (Async)
-    if ((navigator as any).brave && await (navigator as any).brave.isBrave()) {
+    if ((navigator as any).brave && (await (navigator as any).brave.isBrave())) {
         return 'brave';
     }
     return 'chrome';
@@ -96,7 +102,7 @@ function renderNotices(notices: Notice[], game: GameType) {
     if (!noticeContainer) return;
     noticeContainer.innerHTML = '';
 
-    const currentNotices = notices.filter(n => {
+    const currentNotices = notices.filter((n) => {
         // 1. Check Game Target
         const isGameMatch = n.targetGame.includes(game);
         if (!isGameMatch) return false;
@@ -106,7 +112,7 @@ function renderNotices(notices: Notice[], game: GameType) {
         return n.targetBrowser.includes(currentBrowser);
     });
 
-    currentNotices.forEach(notice => {
+    currentNotices.forEach((notice) => {
         const a = document.createElement('a');
         a.className = 'sub-link';
         a.href = notice.link;
@@ -136,7 +142,7 @@ function renderPatchNotes(notes: PatchNote[], game: GameType) {
         return;
     }
 
-    notes.forEach(note => {
+    notes.forEach((note) => {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = note.link;
@@ -181,10 +187,10 @@ function updatePatchNotes(game: GameType) {
     // 2. Fetch Fresh Data (Background)
     const apiGame = game === 'poe' ? 'poe1' : 'poe2';
 
-    fetchPatchNotes(apiGame, patchNoteCount).then(fetchedNotes => {
+    fetchPatchNotes(apiGame, patchNoteCount).then((fetchedNotes) => {
         // 3. Diff and Merge Logic
-        const processedNotes: PatchNote[] = fetchedNotes.map(newNote => {
-            const existsInCache = initialNotes.some(cached => cached.link === newNote.link);
+        const processedNotes: PatchNote[] = fetchedNotes.map((newNote) => {
+            const existsInCache = initialNotes.some((cached) => cached.link === newNote.link);
             return {
                 ...newNote,
                 isNew: !existsInCache // Marked New if not found in previous cache
@@ -220,20 +226,22 @@ async function updateGameUI(game: GameType) {
     }
 
     // Always fetch/re-calculate in background to handle updates
-    extractThemeColors(config.bgImage, config.fallback).then(newColors => {
-        // Compare new vs cached to decide if update needed
-        // Simple JSON stringify comparison
-        if (!cached || JSON.stringify(newColors) !== JSON.stringify(cached)) {
-            applyThemeColors(newColors);
-            cachedThemeColors[config.bgImage] = newColors;
-            saveSetting(STORAGE_KEYS.CACHED_THEME_COLORS, cachedThemeColors);
-        }
-    }).catch(() => {
-        // Only apply fallback if no cache existed
-        if (!cached) {
-            applyThemeColors(config.fallback);
-        }
-    });
+    extractThemeColors(config.bgImage, config.fallback)
+        .then((newColors) => {
+            // Compare new vs cached to decide if update needed
+            // Simple JSON stringify comparison
+            if (!cached || JSON.stringify(newColors) !== JSON.stringify(cached)) {
+                applyThemeColors(newColors);
+                cachedThemeColors[config.bgImage] = newColors;
+                saveSetting(STORAGE_KEYS.CACHED_THEME_COLORS, cachedThemeColors);
+            }
+        })
+        .catch(() => {
+            // Only apply fallback if no cache existed
+            if (!cached) {
+                applyThemeColors(config.fallback);
+            }
+        });
 
     // Logos
     if (game === 'poe') {
@@ -267,7 +275,7 @@ async function updateGameUI(game: GameType) {
     renderNotices(cachedNotices, game);
 
     // 2. Fetch & Update if changed
-    fetchNotices().then(newNotices => {
+    fetchNotices().then((newNotices) => {
         // Simple equality check by stringify
         const isChanged = JSON.stringify(newNotices) !== JSON.stringify(cachedNotices);
 
@@ -282,10 +290,6 @@ async function updateGameUI(game: GameType) {
     updatePatchNotes(game);
 }
 
-
-
-
-
 function switchTab(targetTab: 'patchNotes' | 'settings' | 'help') {
     // 1. Identify current state
     const isPatchNotesActive = tabPanelPatchNotes.classList.contains('active');
@@ -293,9 +297,11 @@ function switchTab(targetTab: 'patchNotes' | 'settings' | 'help') {
     const isHelpActive = tabPanelHelp.classList.contains('active');
 
     // 2. Check if we are closing the current tab (Fold)
-    if ((targetTab === 'patchNotes' && isPatchNotesActive) ||
+    if (
+        (targetTab === 'patchNotes' && isPatchNotesActive) ||
         (targetTab === 'settings' && isSettingsActive) ||
-        (targetTab === 'help' && isHelpActive)) {
+        (targetTab === 'help' && isHelpActive)
+    ) {
         // Close everything
         tabPanelPatchNotes.classList.remove('active');
         tabPanelSettings.classList.remove('active');
@@ -364,7 +370,9 @@ function updatePluginDisabledState(isDisabled: boolean) {
         launchBtn.style.pointerEvents = 'none';
         launchBtn.removeAttribute('href');
         if (settingsContainer) {
-            const toggle = settingsContainer.querySelector(`input[data-key="pluginDisable"]`) as HTMLInputElement;
+            const toggle = settingsContainer.querySelector(
+                `input[data-key="pluginDisable"]`
+            ) as HTMLInputElement;
             if (toggle) toggle.checked = true;
         }
     } else {
@@ -372,7 +380,9 @@ function updatePluginDisabledState(isDisabled: boolean) {
         launchBtn.style.pointerEvents = 'auto';
         launchBtn.href = '#';
         if (settingsContainer) {
-            const toggle = settingsContainer.querySelector(`input[data-key="pluginDisable"]`) as HTMLInputElement;
+            const toggle = settingsContainer.querySelector(
+                `input[data-key="pluginDisable"]`
+            ) as HTMLInputElement;
             if (toggle) toggle.checked = false;
         }
     }
@@ -382,7 +392,7 @@ function renderSettings(settings: AppSettings) {
     if (!settingsContainer) return;
     settingsContainer.innerHTML = '';
 
-    SETTINGS_CONFIG.forEach(item => {
+    SETTINGS_CONFIG.forEach((item) => {
         const groupDiv = document.createElement('div');
         groupDiv.className = 'control-group';
         if (item.key === 'pluginDisable') groupDiv.id = 'pluginDisableGroup';
@@ -416,7 +426,6 @@ function renderSettings(settings: AppSettings) {
             labelContainer.appendChild(labelSpan);
             labelContainer.appendChild(tooltipWrapper);
             groupDiv.appendChild(labelContainer);
-
         } else {
             const labelSpan = document.createElement('span');
             labelSpan.className = 'label-text';
@@ -449,7 +458,6 @@ function renderSettings(settings: AppSettings) {
             labelSwitch.appendChild(input);
             labelSwitch.appendChild(slider);
             groupDiv.appendChild(labelSwitch);
-
         } else if (item.type === 'number') {
             const input = document.createElement('input');
             input.type = 'number';
@@ -484,7 +492,9 @@ launchBtn.addEventListener('click', async (e) => {
     // Check the checkbox state directly from DOM for synchronous access
 
     // Simplest: Check the checkbox in DOM since it reflects current state
-    const closePopupCheckbox = document.querySelector(`input[data-key="closePopup"]`) as HTMLInputElement;
+    const closePopupCheckbox = document.querySelector(
+        `input[data-key="closePopup"]`
+    ) as HTMLInputElement;
     const isClosePopupFn = closePopupCheckbox ? closePopupCheckbox.checked : false;
 
     const targetUrl = launchBtn.dataset.url || GAME_CONFIG.poe2.url;
@@ -505,7 +515,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Apply initial states of special actions
 
-
     const isDisabled = settings.pluginDisable;
     updatePluginDisabledState(isDisabled);
 
@@ -522,7 +531,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace !== 'local') return;
 
     for (const [key, { newValue }] of Object.entries(changes)) {
-        const item = SETTINGS_CONFIG.find(i => i.key === key);
+        const item = SETTINGS_CONFIG.find((i) => i.key === key);
         if (item) {
             // 1. Trigger Action Side-Effects
             if (item.actionId) {
@@ -531,12 +540,17 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
             // 2. Sync UI State (if changed externally)
             if (settingsContainer) {
-                const input = settingsContainer.querySelector(`input[data-key="${item.key}"]`) as HTMLInputElement;
+                const input = settingsContainer.querySelector(
+                    `input[data-key="${item.key}"]`
+                ) as HTMLInputElement;
                 if (input) {
                     // Check if value actually differs to avoid cursor jumps or loops (though 'change' event breaks loop)
                     if (item.type === 'switch' && input.checked !== !!newValue) {
                         input.checked = !!newValue;
-                    } else if (item.type === 'number' && input.value !== (newValue as any).toString()) {
+                    } else if (
+                        item.type === 'number' &&
+                        input.value !== (newValue as any).toString()
+                    ) {
                         input.value = (newValue as any).toString();
                     }
                 }

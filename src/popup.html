@@ -1,120 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>POE & POE2 빠른 실행 (Kakao)</title>
+        <link rel="stylesheet" href="frame.css" />
+        <link rel="stylesheet" href="style.css" />
+        <script src="popup.ts" type="module"></script>
+    </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>POE & POE2 빠른 실행 (Kakao)</title>
-  <link rel="stylesheet" href="frame.css">
-  <link rel="stylesheet" href="style.css">
-  <script src="popup.ts" type="module"></script>
-</head>
+    <body>
+        <div id="app">
+            <!-- Gothic Top Frame Decorations -->
+            <div class="frame-decoration top-left"></div>
+            <div class="frame-decoration top-right"></div>
+            <div class="frame-decoration top-center"></div>
 
-<body>
-  <div id="app">
-    <!-- Gothic Top Frame Decorations -->
-    <div class="frame-decoration top-left"></div>
-    <div class="frame-decoration top-right"></div>
-    <div class="frame-decoration top-center"></div>
+            <!-- Side Borders -->
+            <div class="frame-border border-left"></div>
+            <div class="frame-border border-right"></div>
 
-    <!-- Side Borders -->
-    <div class="frame-border border-left"></div>
-    <div class="frame-border border-right"></div>
+            <!-- Main Content -->
+            <div class="content-wrapper">
+                <!-- 1. Main Section (Top: Fixed/Natural Height) -->
+                <div class="main-section">
+                    <div class="logo-container">
+                        <img id="logoPoe" src="assets/poe/logo.png" class="logo" alt="POE Logo" />
+                        <img
+                            id="logoPoe2"
+                            src="assets/poe2/logo.png"
+                            class="logo-sub"
+                            alt="POE2 Logo"
+                        />
+                    </div>
 
-    <!-- Main Content -->
-    <div class="content-wrapper">
-      <!-- 1. Main Section (Top: Fixed/Natural Height) -->
-      <div class="main-section">
-        <div class="logo-container">
-          <img id="logoPoe" src="assets/poe/logo.png" class="logo" alt="POE Logo" />
-          <img id="logoPoe2" src="assets/poe2/logo.png" class="logo-sub" alt="POE2 Logo" />
+                    <div class="action-section">
+                        <a id="launchBtn" class="main-start__link" href="#">
+                            <span class="hover-overlay"></span>
+                            <span class="text-blind">게임 시작</span>
+                        </a>
+
+                        <!-- Sub Actions: Homepage & Trade -->
+                        <div class="sub-actions">
+                            <a id="btnHomepage" class="menu-btn" href="#" target="_blank">
+                                <span class="btn-text">홈페이지</span>
+                            </a>
+                            <a id="btnTrade" class="menu-btn" href="#" target="_blank">
+                                <span class="btn-text">거래소</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Menu Section (Middle: Fills Remaining Space) -->
+                <!-- 2. Tab Content Section (Middle: Fills Remaining Space, Scrollable) -->
+                <div id="tabContentContainer" class="tab-content-container">
+                    <!-- Tab 1: Patch Notes (Default Active) -->
+                    <div id="tabPanelPatchNotes" class="tab-panel active">
+                        <ul
+                            id="patchNoteList-poe"
+                            class="patch-note-list"
+                            style="display: none"
+                        ></ul>
+                        <ul
+                            id="patchNoteList-poe2"
+                            class="patch-note-list"
+                            style="display: none"
+                        ></ul>
+                        <a id="patchNoteMoreBtn" href="#" target="_blank" class="patch-note-more"
+                            >더보기</a
+                        >
+                    </div>
+
+                    <!-- Tab 2: Help (Notices) -->
+                    <div id="tabPanelHelp" class="tab-panel">
+                        <div id="noticeContainer" class="notice-list"></div>
+                    </div>
+
+                    <!-- Tab 2: Settings -->
+                    <div id="tabPanelSettings" class="tab-panel">
+                        <div id="settingsContainer"></div>
+                    </div>
+                </div>
+
+                <!-- Bottom Tab Navigation -->
+                <div class="bottom-tab-nav">
+                    <button id="tabBtnPatchNotes" class="tab-btn active">패치노트</button>
+                    <button id="tabBtnHelp" class="tab-btn">도움말</button>
+                    <button id="tabBtnSettings" class="tab-btn">설정</button>
+                </div>
+
+                <div class="footer-section">
+                    <div class="description top-guide">
+                        <p>
+                            * <strong>게임 시작</strong>을 누르거나, 홈페이지 URL 뒤에
+                            <code>#autoStart</code> 를 붙여 접속하면 자동 실행이 시작됩니다.
+                        </p>
+                    </div>
+
+                    <div class="company-logos">
+                        <img
+                            src="assets/img-ci-kakaogames_158x28.png"
+                            class="ci-kakao"
+                            alt="Kakao Games"
+                        />
+                        <span class="ci-divider"></span>
+                        <img
+                            src="assets/img-ci-ggg_150x67.png"
+                            class="ci-ggg"
+                            alt="Grinding Gear Games"
+                        />
+                    </div>
+
+                    <div class="footer-links">
+                        <a
+                            class="support-badge"
+                            href="https://nerdhead-lab.github.io/POE2-quick-launch-for-kakao?docs=SUPPORT.md"
+                            target="_blank"
+                        >
+                            <span class="badge-icon">☕</span>
+                            <span class="badge-text">후원하기</span>
+                        </a>
+                        <span class="footer-divider">|</span>
+                        <a
+                            class="issue-link"
+                            href="https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/issues"
+                            target="_blank"
+                        >
+                            기능 건의/버그 제보
+                        </a>
+                    </div>
+
+                    <div class="credits-banner">
+                        <span class="credits-text">Powered by NERDHEAD LAB</span>
+                        <a
+                            href="https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao"
+                            target="_blank"
+                            class="github-link"
+                        >
+                            <img
+                                src="assets/icon-github.svg"
+                                class="github-icon"
+                                alt="GitHub Repo"
+                            />
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="action-section">
-          <a id="launchBtn" class="main-start__link" href="#">
-            <span class="hover-overlay"></span>
-            <span class="text-blind">게임 시작</span>
-          </a>
-
-          <!-- Sub Actions: Homepage & Trade -->
-          <div class="sub-actions">
-            <a id="btnHomepage" class="menu-btn" href="#" target="_blank">
-              <span class="btn-text">홈페이지</span>
-            </a>
-            <a id="btnTrade" class="menu-btn" href="#" target="_blank">
-              <span class="btn-text">거래소</span>
-            </a>
-          </div>
-
-
-        </div>
-      </div>
-
-      <!-- 2. Menu Section (Middle: Fills Remaining Space) -->
-      <!-- 2. Tab Content Section (Middle: Fills Remaining Space, Scrollable) -->
-      <div id="tabContentContainer" class="tab-content-container">
-
-        <!-- Tab 1: Patch Notes (Default Active) -->
-        <div id="tabPanelPatchNotes" class="tab-panel active">
-          <ul id="patchNoteList-poe" class="patch-note-list" style="display: none;"></ul>
-          <ul id="patchNoteList-poe2" class="patch-note-list" style="display: none;"></ul>
-          <a id="patchNoteMoreBtn" href="#" target="_blank" class="patch-note-more">더보기</a>
-        </div>
-
-        <!-- Tab 2: Help (Notices) -->
-        <div id="tabPanelHelp" class="tab-panel">
-          <div id="noticeContainer" class="notice-list"></div>
-        </div>
-
-        <!-- Tab 2: Settings -->
-        <div id="tabPanelSettings" class="tab-panel">
-          <div id="settingsContainer"></div>
-        </div>
-      </div>
-
-      <!-- Bottom Tab Navigation -->
-      <div class="bottom-tab-nav">
-        <button id="tabBtnPatchNotes" class="tab-btn active">패치노트</button>
-        <button id="tabBtnHelp" class="tab-btn">도움말</button>
-        <button id="tabBtnSettings" class="tab-btn">설정</button>
-      </div>
-
-      <div class="footer-section">
-        <div class="description top-guide">
-          <p>
-            * <strong>게임 시작</strong>을 누르거나, 홈페이지 URL 뒤에
-            <code>#autoStart</code> 를 붙여 접속하면 자동 실행이 시작됩니다.
-          </p>
-        </div>
-
-        <div class="company-logos">
-          <img src="assets/img-ci-kakaogames_158x28.png" class="ci-kakao" alt="Kakao Games" />
-          <span class="ci-divider"></span>
-          <img src="assets/img-ci-ggg_150x67.png" class="ci-ggg" alt="Grinding Gear Games" />
-        </div>
-
-        <div class="footer-links">
-          <a class="support-badge" href="https://nerdhead-lab.github.io/POE2-quick-launch-for-kakao?docs=SUPPORT.md"
-            target="_blank">
-            <span class="badge-icon">☕</span>
-            <span class="badge-text">후원하기</span>
-          </a>
-          <span class="footer-divider">|</span>
-          <a class="issue-link" href="https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao/issues"
-            target="_blank">
-            기능 건의/버그 제보
-          </a>
-        </div>
-
-        <div class="credits-banner">
-          <span class="credits-text">Powered by NERDHEAD LAB</span>
-          <a href="https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao" target="_blank" class="github-link">
-            <img src="assets/icon-github.svg" class="github-icon" alt="GitHub Repo" />
-          </a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</body>
-
+    </body>
 </html>

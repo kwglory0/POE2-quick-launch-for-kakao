@@ -11,7 +11,7 @@ const packageName = packageJson.name;
 
 // 0. Cleanup existing zip files
 const dir = process.cwd();
-fs.readdirSync(dir).forEach(file => {
+fs.readdirSync(dir).forEach((file) => {
     // Clean up firefox zip
     if (file.startsWith(packageName) && file.endsWith('-firefox.zip')) {
         console.log(`Removing old zip: ${file}`);
@@ -43,8 +43,8 @@ const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 // Inject browser_specific_settings for Gecko (Firefox)
 manifest.browser_specific_settings = {
     gecko: {
-        id: "poe2-quick-launch@nerdhead.lab", // Fixed ID for updates
-        strict_min_version: "109.0"
+        id: 'poe2-quick-launch@nerdhead.lab', // Fixed ID for updates
+        strict_min_version: '109.0'
     }
 };
 
@@ -57,13 +57,13 @@ if (manifest.background && manifest.background.service_worker) {
     // Note: We MUST keep 'type': 'module' because Vite bundles this as an ES Module.
     // Firefox supports type: 'module' with background.scripts (or at least tolerates it for loading).
     // If we delete it, it tries to load as Classic Script and fails on 'import/export'.
-    // delete manifest.background.type; 
+    // delete manifest.background.type;
 }
 
 // Remove 'use_dynamic_url' from web_accessible_resources (Firefox doesn't support it)
 if (manifest.web_accessible_resources) {
     console.log('Cleaning web_accessible_resources for Firefox...');
-    manifest.web_accessible_resources = manifest.web_accessible_resources.map(resource => {
+    manifest.web_accessible_resources = manifest.web_accessible_resources.map((resource) => {
         // Create a shallow copy and delete the forbidden property
         const newResource = { ...resource };
         if ('use_dynamic_url' in newResource) {
@@ -78,7 +78,10 @@ console.log('Manifest patched successfully.');
 
 // 3. Zip it
 // Zip contents of dist-firefox
-const filesToZip = fs.readdirSync(firefoxDistDir).map(f => `"${f}"`).join(' '); // Add quotes for safety
+const filesToZip = fs
+    .readdirSync(firefoxDistDir)
+    .map((f) => `"${f}"`)
+    .join(' '); // Add quotes for safety
 
 const command = `npx bestzip ../${fileName} ${filesToZip}`;
 
