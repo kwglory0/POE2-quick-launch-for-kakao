@@ -1,10 +1,9 @@
+import { EXT_URLS } from './constants';
 import { Notice } from './storage';
-
-const NOTICE_URL = 'https://nerdhead-lab.github.io/POE2-quick-launch-for-kakao/notice.json';
 
 export async function fetchNotices(): Promise<Notice[]> {
     try {
-        const response = await fetch(NOTICE_URL);
+        const response = await fetch(EXT_URLS.NOTICE_JSON);
         if (!response.ok) {
             throw new Error(`Failed to fetch notices: ${response.statusText}`);
         }

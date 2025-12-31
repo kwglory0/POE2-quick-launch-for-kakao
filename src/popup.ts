@@ -1,5 +1,6 @@
 import bgPoe from './assets/poe/bg-keepers.png';
 import bgPoe2 from './assets/poe2/bg-forest.webp';
+import { EXT_URLS } from './constants';
 import { fetchNotices } from './notice';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
 import { SETTINGS_CONFIG, SettingItem } from './settings';
@@ -53,9 +54,9 @@ const GAME_CONFIG = {
     poe: {
         bgClass: 'bg-poe',
         bgImage: bgPoe,
-        url: 'https://poe.game.daum.net#autoStart',
-        homepageUrl: 'https://poe.game.daum.net/',
-        tradeUrl: 'https://poe.game.daum.net/trade',
+        url: EXT_URLS.POE.AUTO_START,
+        homepageUrl: EXT_URLS.POE.HOMEPAGE,
+        tradeUrl: EXT_URLS.POE.TRADE,
         fallback: {
             text: '#c8c8c8',
             accent: '#dfcf99', // Gold
@@ -65,9 +66,9 @@ const GAME_CONFIG = {
     poe2: {
         bgClass: 'bg-poe2',
         bgImage: bgPoe2,
-        url: 'https://pathofexile2.game.daum.net/main#autoStart',
-        homepageUrl: 'https://pathofexile2.game.daum.net/main',
-        tradeUrl: 'https://poe.game.daum.net/trade2',
+        url: EXT_URLS.POE2.AUTO_START,
+        homepageUrl: EXT_URLS.POE2.HOMEPAGE,
+        tradeUrl: EXT_URLS.POE2.TRADE,
         fallback: {
             text: '#b5c2b5',
             accent: '#aaddaa', // Mint
@@ -80,8 +81,7 @@ const GAME_CONFIG = {
 
 function updateMoreButton(game: GameType) {
     if (patchNoteMoreBtn) {
-        const apiGame = game === 'poe' ? 'poe1' : 'poe2';
-        patchNoteMoreBtn.href = getPatchNoteUrl(apiGame);
+        patchNoteMoreBtn.href = getPatchNoteUrl(game);
     }
 }
 
@@ -185,9 +185,7 @@ function updatePatchNotes(game: GameType) {
     }
 
     // 2. Fetch Fresh Data (Background)
-    const apiGame = game === 'poe' ? 'poe1' : 'poe2';
-
-    fetchPatchNotes(apiGame, patchNoteCount).then((fetchedNotes) => {
+    fetchPatchNotes(game, patchNoteCount).then((fetchedNotes) => {
         // 3. Diff and Merge Logic
         const processedNotes: PatchNote[] = fetchedNotes.map((newNote) => {
             const existsInCache = initialNotes.some((cached) => cached.link === newNote.link);
