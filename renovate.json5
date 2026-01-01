@@ -1,24 +1,24 @@
 {
-    $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+    $schema: "https://docs.renovatebot.com/renovate-schema.json",
     extends: [
-        'config:recommended',
-        ':dependencyDashboard',
-        'helpers:pinGitHubActionDigestsToSemver'
+        "config:recommended",
+        ":dependencyDashboard",
+        "helpers:pinGitHubActionDigestsToSemver",
     ],
-    timezone: 'Asia/Seoul',
-    schedule: ['every monday'],
+    timezone: "Asia/Seoul",
+    schedule: ["on monday"],
     packageRules: [
         {
-            matchUpdateTypes: ['minor', 'patch'],
-            matchCurrentVersion: '!/^0/',
+            matchUpdateTypes: ["minor", "patch"],
+            matchCurrentVersion: "!/^0/",
             automerge: true,
-            groupName: 'all non-major dependencies'
+            groupName: "all non-major dependencies",
         },
         {
-            matchPackagePatterns: ['eslint', 'prettier'],
-            groupName: 'lint & format'
-        }
+            groupName: "lint & format",
+            matchPackageNames: ["/eslint/", "/prettier/"],
+        },
     ],
-    labels: ['dependencies'],
-    commitMessagePrefix: 'chore(deps): '
+    labels: ["dependencies"],
+    commitMessagePrefix: "chore(deps): ",
 }
