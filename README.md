@@ -103,9 +103,13 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
 
 ## 기술 스택
 
-- **Framework**: React, Vite
+- **Framework**: React, Vite (+ [CRXJS](https://crxjs.dev/))
 - **Language**: TypeScript
 - **Style**: CSS (Vanilla)
+- **CI/CD & Automation**: GitHub Actions (release-please, [Renovate](https://docs.renovatebot.com/))
+- **Quality & Security**: CodeQL, SonarCloud, ESLint, Prettier, Husky
+- **Testing**: Vitest, JSDOM
+- **Target Browsers**: Chromium (Chrome, Edge, Whale), Firefox
 
 ## 라이선스
 
