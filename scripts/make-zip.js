@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -12,24 +12,24 @@ const packageName = packageJson.name;
 // 0. Cleanup existing zip files
 const dir = process.cwd();
 fs.readdirSync(dir).forEach((file) => {
-    // Clean up typical zip patterns
-    if (file.startsWith(packageName) && file.endsWith('.zip')) {
+    // Clean up typical zip patterns, but EXCLUDE firefox zip
+    if (file.startsWith(packageName) && file.endsWith('.zip') && !file.endsWith('-firefox.zip')) {
         console.log(`Removing old zip: ${file}`);
         fs.unlinkSync(path.join(dir, file));
     }
 });
 
 // Filename format: {package-name}-v{version}.zip
-const fileName = `${packageName}-v${version}.zip`;
+const fileName = `${packageName}-v{version}.zip`.replace('{version}', version);
 
 console.log(`Creating zip file: ${fileName}`);
 
-// Use npx to ensure we find bestzip from node_modules
-const command = `npx bestzip ${fileName} dist/`;
+// Find bestzip CLI script
+const bestzipCli = path.join(dir, 'node_modules', 'bestzip', 'bin', 'cli.js');
 
-console.log(`Executing: ${command}`);
+console.log(`Executing: node ${bestzipCli} ${fileName} dist/`);
 
-exec(command, (error, stdout, stderr) => {
+execFile(process.execPath, [bestzipCli, fileName, 'dist/'], (error, stdout, stderr) => {
     if (error) {
         console.error(`Error creating zip: ${error.message}`);
         process.exit(1);

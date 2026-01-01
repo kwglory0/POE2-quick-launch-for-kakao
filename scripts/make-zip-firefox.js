@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process';
+import { execFile } from 'node:child_process';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -78,21 +78,29 @@ console.log('Manifest patched successfully.');
 
 // 3. Zip it
 // Zip contents of dist-firefox
-const filesToZip = fs
-    .readdirSync(firefoxDistDir)
-    .map((f) => `"${f}"`)
-    .join(' '); // Add quotes for safety
+const filesToZip = fs.readdirSync(firefoxDistDir);
 
-const command = `npx bestzip ../${fileName} ${filesToZip}`;
+// Find bestzip CLI script
+const rootDir = path.join(dir);
+const bestzipCli = path.join(rootDir, 'node_modules', 'bestzip', 'bin', 'cli.js');
 
-console.log(`Executing in dist-firefox/: ${command}`);
+const relativeZipPath = path.join('..', fileName);
 
-exec(command, { cwd: firefoxDistDir }, (error, stdout, stderr) => {
-    if (error) {
-        console.error(`Error creating zip: ${error.message}`);
-        process.exit(1);
+console.log(
+    `Executing in dist-firefox/: node ${bestzipCli} ${relativeZipPath} ${filesToZip.join(' ')}`
+);
+
+execFile(
+    process.execPath,
+    [bestzipCli, relativeZipPath, ...filesToZip],
+    { cwd: firefoxDistDir },
+    (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error creating zip: ${error.message}`);
+            process.exit(1);
+        }
+        console.log(stdout);
+        if (stderr) console.error(stderr);
+        console.log(`Success! Created ${fileName}`);
     }
-    console.log(stdout);
-    if (stderr) console.error(stderr);
-    console.log(`Success! Created ${fileName}`);
-});
+);
