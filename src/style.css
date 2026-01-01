@@ -64,8 +64,8 @@ body.bg-poe2 {
 }
 
 .action-section {
-    margin-top: -4px;
-    margin-bottom: 4px;
+    margin-top: 0;
+    margin-bottom: 8px;
     position: relative;
     z-index: 10;
 }
@@ -82,9 +82,6 @@ body.bg-poe2 {
 }
 
 /* Remove collapsing logic for container size */
-.tab-content-container.collapsed {
-    /* No size change, just visual consistency if needed */
-}
 
 /* Tab Panels - Absolute Positioning for Overlay Animations */
 .tab-panel {
@@ -160,8 +157,8 @@ body.bg-poe2 {
 }
 
 .tab-btn:hover {
-    color: #ccc;
-    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .tab-btn.active {
@@ -221,14 +218,18 @@ body.bg-poe2 {
     background-position: center;
     z-index: 20;
     gap: 6px;
-    /* Space between text and icon */
+    filter: brightness(1.5);
 }
 
 .credits-text {
+    font-family: 'Times New Roman', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #7a6e5d;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     margin-top: 28px;
-    font-size: 9px;
-    color: #555;
-    text-shadow: none;
 }
 
 .github-link {
@@ -260,7 +261,7 @@ body.bg-poe2 {
     align-items: center;
     justify-content: center;
     gap: 4px;
-    /* Margin moved to container .footer-links */
+    margin: 0;
     padding: 3px 8px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -291,9 +292,6 @@ body.bg-poe2 {
 }
 
 /* Adjust Support Badge Margin since it's now in container */
-.support-badge {
-    margin: 0;
-}
 
 .footer-divider {
     color: rgba(255, 255, 255, 0.2);
@@ -306,12 +304,12 @@ body.bg-poe2 {
     align-items: center;
     justify-content: center;
     padding: 3px 8px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
 
     font-size: 10px;
-    color: #bbb;
+    color: #fff;
     text-decoration: none;
     font-family: 'Tahoma', sans-serif;
     letter-spacing: 0.02em;
@@ -321,7 +319,7 @@ body.bg-poe2 {
 }
 
 .issue-link:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.6);
     border-color: var(--theme-accent, #dfcf99);
     color: var(--theme-accent, #dfcf99);
     transform: translateY(-1px);
@@ -404,13 +402,6 @@ img.inactive {
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
     position: relative;
     left: -5px;
-}
-
-.action-section {
-    margin-top: 0;
-    margin-bottom: 8px;
-    position: relative;
-    z-index: 10;
 }
 
 /* Game Start Button */
@@ -606,6 +597,8 @@ img.inactive {
     background-image:
         url('assets/btn-generic-pressed-left.png'), url('assets/btn-generic-pressed-right.png'),
         url('assets/btn-generic-pressed-mid.png');
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 .menu-btn:active .btn-text {
@@ -615,10 +608,6 @@ img.inactive {
 }
 
 /* Active/Click State */
-.menu-btn:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-}
 
 .sub-link:hover .btn-text {
     color: #fff;
@@ -998,8 +987,8 @@ body.plugin-disabled #pluginDisableGroup {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #dfcf99;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
     font-size: 10px;
     font-weight: bold;
     font-family: serif;
@@ -1062,19 +1051,4 @@ body.plugin-disabled #pluginDisableGroup {
     width: 1px;
     height: 12px;
     background-color: #666;
-}
-
-.credits-banner {
-    filter: brightness(1.5);
-}
-
-.credits-text {
-    font-family: 'Times New Roman', serif;
-    font-size: 10px;
-    letter-spacing: 1px;
-    color: #7a6e5d;
-    text-transform: uppercase;
-    font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    margin-top: 28px;
 }
