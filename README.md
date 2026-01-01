@@ -48,7 +48,7 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
 
 ### 요구 사항
 
-- Node.js 22+
+- Node.js 24+ (프로젝트 루트의 `.npmrc`에 의해 버전이 강제됩니다.)
 - npm
 
 ### 설치 및 로드 방법
@@ -58,6 +58,10 @@ Kakao Games의 Path of Exile (1 & 2) 웹 실행을 간소화하고 자동화하�
     ```bash
     git clone https://github.com/NERDHEAD-lab/POE2-quick-launch-for-kakao.git
     cd POE2-quick-launch-for-kakao
+
+    # .nvmrc를 사용하여 권장 Node.js 버전으로 전환 (nvm 설치 시)
+    nvm use
+
     npm install
     ```
 
