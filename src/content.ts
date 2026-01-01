@@ -111,7 +111,7 @@ const DaumLoginHandler: PageHandler = {
                 (nextUrl.pathname.includes('/gamestart/poe.html') ||
                     nextUrl.pathname.includes('/gamestart/poe2.html'))
             );
-        } catch (e) {
+        } catch {
             return false;
         }
     },
@@ -497,8 +497,7 @@ function manageIntroModal(preferTodayClose: boolean) {
 }
 
 // Entry Point
-loadSettings().then((settings) => {
-    dispatchPageLogic(settings);
-});
+const settings = await loadSettings();
+dispatchPageLogic(settings);
 
 export {};

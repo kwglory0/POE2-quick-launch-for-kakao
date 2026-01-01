@@ -47,7 +47,14 @@ export default [
                 }
             ],
             'import/newline-after-import': ['error', { count: 1 }],
-            '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    argsIgnorePattern: '^_',
+                    caughtErrors: 'all',
+                    caughtErrorsIgnorePattern: '^_'
+                }
+            ],
             '@typescript-eslint/no-explicit-any': 'warn'
         }
     },

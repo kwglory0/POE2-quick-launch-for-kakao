@@ -7,9 +7,9 @@ export function rgbToHsl(r: number, g: number, b: number) {
     b /= 255;
     const max = Math.max(r, g, b),
         min = Math.min(r, g, b);
-    let h = 0,
-        s,
-        l = (max + min) / 2;
+    let h = 0;
+    let s: number;
+    const l = (max + min) / 2;
 
     if (max === min) {
         h = s = 0; // achromatic
@@ -65,7 +65,7 @@ export async function extractThemeColors(
             ctx.drawImage(img, 0, 0, 1, 1);
             const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
 
-            let [h, s, l] = rgbToHsl(r, g, b);
+            const [h, s, l] = rgbToHsl(r, g, b);
 
             const accentS = Math.max(s * 100, 50);
             const accentL = Math.max(Math.min(l * 100 * 1.5, 80), 60);

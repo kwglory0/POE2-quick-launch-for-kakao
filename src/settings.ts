@@ -1,12 +1,15 @@
 import { AppSettings } from './storage';
 
-interface BaseSetting {
+export type SettingValue = boolean | number;
+
+interface BaseSetting<T extends SettingValue> {
     key: keyof AppSettings;
     label: string;
     actionId?: string; // Optional identifier for special logic (side effects)
+    defaultValue?: T; // For future extensibility
 }
 
-export interface SwitchSetting extends BaseSetting {
+export interface SwitchSetting extends BaseSetting<boolean> {
     type: 'switch';
     tooltip?: {
         icon: string;
@@ -15,7 +18,7 @@ export interface SwitchSetting extends BaseSetting {
     styleClass?: string; // e.g., 'red'
 }
 
-export interface NumberSetting extends BaseSetting {
+export interface NumberSetting extends BaseSetting<number> {
     type: 'number';
     min: number;
     max: number;

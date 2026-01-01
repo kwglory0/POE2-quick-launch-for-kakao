@@ -3,7 +3,7 @@ import bgPoe2 from './assets/poe2/bg-forest.webp';
 import { EXT_URLS } from './constants';
 import { fetchNotices } from './notice';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
-import { SETTINGS_CONFIG, SettingItem } from './settings';
+import { SETTINGS_CONFIG, SettingItem, SettingValue } from './settings';
 import {
     loadSettings,
     saveSetting,
@@ -92,6 +92,7 @@ async function detectBrowser(): Promise<BrowserType> {
     if (ua.includes('Firefox')) return 'firefox';
     if (ua.includes('Edg')) return 'edge';
     // Brave Detection (Async)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((navigator as any).brave && (await (navigator as any).brave.isBrave())) {
         return 'brave';
     }
@@ -350,14 +351,14 @@ logoPoe2.addEventListener('click', () => {
     }
 });
 
-function handleSettingAction(item: SettingItem, value: any) {
+function handleSettingAction(item: SettingItem, value: SettingValue) {
     if (!item.actionId) return;
 
     if (item.actionId === 'togglePluginDisable') {
-        updatePluginDisabledState(value);
+        updatePluginDisabledState(value as boolean);
     } else if (item.actionId === 'updatePatchNoteCount') {
         // Value is already saved via general handler, just update UI
-        patchNoteCount = value;
+        patchNoteCount = value as number;
         updatePatchNotes(selectedGame);
     }
 }
@@ -439,7 +440,7 @@ function renderSettings(settings: AppSettings) {
             const input = document.createElement('input');
             input.type = 'checkbox';
             let initialValue = settings[item.key];
-            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            if (initialValue === undefined) initialValue = DEFAULT_SETTINGS[item.key];
             input.checked = !!initialValue;
             input.dataset.key = item.key;
 
@@ -473,7 +474,7 @@ function renderSettings(settings: AppSettings) {
             input.min = item.min.toString();
             input.max = item.max.toString();
             let initialValue = settings[item.key];
-            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            if (initialValue === undefined) initialValue = DEFAULT_SETTINGS[item.key];
             input.value = initialValue.toString();
             input.dataset.key = item.key;
 
@@ -576,7 +577,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         if (item) {
             // 1. Trigger Action Side-Effects
             if (item.actionId) {
-                handleSettingAction(item, newValue);
+                handleSettingAction(item, newValue as boolean | number);
             }
 
             // 2. Sync UI State (if changed externally)
@@ -590,9 +591,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
                         input.checked = !!newValue;
                     } else if (
                         item.type === 'number' &&
-                        input.value !== (newValue as any).toString()
+                        input.value !== (newValue as SettingValue).toString()
                     ) {
-                        input.value = (newValue as any).toString();
+                        input.value = (newValue as SettingValue).toString();
                     }
                 }
             }

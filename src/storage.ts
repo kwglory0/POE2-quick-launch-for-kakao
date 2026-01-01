@@ -63,7 +63,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
  */
 export async function loadSettings(): Promise<AppSettings> {
     return new Promise((resolve) => {
-        chrome.storage.local.get(null, (result: { [key: string]: any }) => {
+        chrome.storage.local.get(null, (result: { [key: string]: unknown }) => {
             const settings: AppSettings = {
                 closeTab: (result[STORAGE_KEYS.CLOSE_TAB] as boolean) ?? DEFAULT_SETTINGS.closeTab,
                 closePopup:

@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite';
 import { crx } from '@crxjs/vite-plugin';
+import { defineConfig } from 'vite';
+
 import manifest from './manifest.json';
 import packageJson from './package.json';
 
@@ -25,7 +26,8 @@ export default defineConfig(({ mode }) => {
             // Disable minification in dev mode for readable stack traces
             minify: isDev ? false : true,
             // Enable source maps in dev mode
-            sourcemap: isDev ? 'inline' : false
+            sourcemap: isDev ? 'inline' : false,
+            target: 'es2022'
         }
     };
 });
