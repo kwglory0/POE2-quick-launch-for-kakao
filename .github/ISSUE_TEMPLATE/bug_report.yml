@@ -8,6 +8,15 @@ body:
               프로그램 사용 중 발생한 오류를 제보합니다.
               제보해주신 내용은 프로그램 개선을 위해 검토 후 조치될 예정입니다.
 
+    - type: checkboxes
+      id: checks
+      attributes:
+          label: 사전 확인 사항
+          description: 이슈를 작성하기 전 아래 사항을 먼저 확인해 주십시오.
+          options:
+              - label: '[FAQ](https://nerdhead-lab.github.io/POE2-quick-launch-for-kakao/?docs=FAQ.md) 페이지를 확인했으나 해결이 불가능한 문제입니까?'
+                required: true
+
     - type: dropdown
       id: browser
       attributes:
