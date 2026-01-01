@@ -3,7 +3,7 @@ import bgPoe2 from './assets/poe2/bg-forest.webp';
 import { EXT_URLS } from './constants';
 import { fetchNotices } from './notice';
 import { fetchPatchNotes, getPatchNoteUrl } from './patch-notes';
-import { SETTINGS_CONFIG, SettingItem } from './settings';
+import { SETTINGS_CONFIG, SettingItem, SettingValue } from './settings';
 import {
     loadSettings,
     saveSetting,
@@ -92,6 +92,7 @@ async function detectBrowser(): Promise<BrowserType> {
     if (ua.includes('Firefox')) return 'firefox';
     if (ua.includes('Edg')) return 'edge';
     // Brave Detection (Async)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((navigator as any).brave && (await (navigator as any).brave.isBrave())) {
         return 'brave';
     }
@@ -350,39 +351,43 @@ logoPoe2.addEventListener('click', () => {
     }
 });
 
-function handleSettingAction(item: SettingItem, value: any) {
+function handleSettingAction(item: SettingItem, value: SettingValue) {
     if (!item.actionId) return;
 
     if (item.actionId === 'togglePluginDisable') {
-        updatePluginDisabledState(value);
+        if (value) {
+            disablePluginUI();
+        } else {
+            enablePluginUI();
+        }
     } else if (item.actionId === 'updatePatchNoteCount') {
         // Value is already saved via general handler, just update UI
-        patchNoteCount = value;
+        patchNoteCount = value as number;
         updatePatchNotes(selectedGame);
     }
 }
 
-function updatePluginDisabledState(isDisabled: boolean) {
-    if (isDisabled) {
-        document.body.classList.add('plugin-disabled');
-        launchBtn.style.pointerEvents = 'none';
-        launchBtn.removeAttribute('href');
-        if (settingsContainer) {
-            const toggle = settingsContainer.querySelector(
-                `input[data-key="pluginDisable"]`
-            ) as HTMLInputElement;
-            if (toggle) toggle.checked = true;
-        }
-    } else {
-        document.body.classList.remove('plugin-disabled');
-        launchBtn.style.pointerEvents = 'auto';
-        launchBtn.href = '#';
-        if (settingsContainer) {
-            const toggle = settingsContainer.querySelector(
-                `input[data-key="pluginDisable"]`
-            ) as HTMLInputElement;
-            if (toggle) toggle.checked = false;
-        }
+function disablePluginUI() {
+    document.body.classList.add('plugin-disabled');
+    launchBtn.style.pointerEvents = 'none';
+    launchBtn.removeAttribute('href');
+    if (settingsContainer) {
+        const toggle = settingsContainer.querySelector(
+            `input[data-key="pluginDisable"]`
+        ) as HTMLInputElement;
+        if (toggle) toggle.checked = true;
+    }
+}
+
+function enablePluginUI() {
+    document.body.classList.remove('plugin-disabled');
+    launchBtn.style.pointerEvents = 'auto';
+    launchBtn.href = '#';
+    if (settingsContainer) {
+        const toggle = settingsContainer.querySelector(
+            `input[data-key="pluginDisable"]`
+        ) as HTMLInputElement;
+        if (toggle) toggle.checked = false;
     }
 }
 
@@ -439,7 +444,7 @@ function renderSettings(settings: AppSettings) {
             const input = document.createElement('input');
             input.type = 'checkbox';
             let initialValue = settings[item.key];
-            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            initialValue ??= DEFAULT_SETTINGS[item.key];
             input.checked = !!initialValue;
             input.dataset.key = item.key;
 
@@ -473,12 +478,13 @@ function renderSettings(settings: AppSettings) {
             input.min = item.min.toString();
             input.max = item.max.toString();
             let initialValue = settings[item.key];
-            if (initialValue === undefined) initialValue = (DEFAULT_SETTINGS as any)[item.key];
+            initialValue ??= DEFAULT_SETTINGS[item.key];
+
             input.value = initialValue.toString();
             input.dataset.key = item.key;
 
             input.addEventListener('change', () => {
-                let val = parseInt(input.value);
+                let val = Number.parseInt(input.value);
                 if (val < item.min) val = item.min;
                 if (val > item.max) val = item.max;
                 input.value = val.toString(); // Reset visual value if clamped
@@ -505,7 +511,7 @@ launchBtn.addEventListener('click', async (e) => {
     ) as HTMLInputElement;
     const isClosePopupFn = closePopupCheckbox ? closePopupCheckbox.checked : false;
 
-    const targetUrl = launchBtn.dataset.url || GAME_CONFIG.poe2.url;
+    const targetUrl = launchBtn.dataset.url ?? GAME_CONFIG.poe2.url;
 
     chrome.tabs.create({ url: targetUrl }, () => {
         if (isClosePopupFn) window.close();
@@ -524,12 +530,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Apply initial states of special actions
 
     const isDisabled = settings.pluginDisable;
-    updatePluginDisabledState(isDisabled);
+    if (isDisabled) {
+        disablePluginUI();
+    } else {
+        enablePluginUI();
+    }
 
     patchNoteCount = settings.patchNoteCount;
-    cachedPatchNotes = settings.cachedPatchNotes || DEFAULT_SETTINGS.cachedPatchNotes; // Load cache
-    cachedNotices = settings.cachedNotices || DEFAULT_SETTINGS.cachedNotices;
-    cachedThemeColors = settings.cachedThemeColors || DEFAULT_SETTINGS.cachedThemeColors;
+    cachedPatchNotes = settings.cachedPatchNotes ?? DEFAULT_SETTINGS.cachedPatchNotes; // Load cache
+    cachedNotices = settings.cachedNotices ?? DEFAULT_SETTINGS.cachedNotices;
+    cachedThemeColors = settings.cachedThemeColors ?? DEFAULT_SETTINGS.cachedThemeColors;
 
     updateGameUI(settings.selectedGame);
 
@@ -576,29 +586,31 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         if (item) {
             // 1. Trigger Action Side-Effects
             if (item.actionId) {
-                handleSettingAction(item, newValue);
+                handleSettingAction(item, newValue as boolean | number);
             }
 
             // 2. Sync UI State (if changed externally)
-            if (settingsContainer) {
-                const input = settingsContainer.querySelector(
-                    `input[data-key="${item.key}"]`
-                ) as HTMLInputElement;
-                if (input) {
-                    // Check if value actually differs to avoid cursor jumps or loops (though 'change' event breaks loop)
-                    if (item.type === 'switch' && input.checked !== !!newValue) {
-                        input.checked = !!newValue;
-                    } else if (
-                        item.type === 'number' &&
-                        input.value !== (newValue as any).toString()
-                    ) {
-                        input.value = (newValue as any).toString();
-                    }
-                }
-            }
+            updateSettingUI(item, newValue as SettingValue);
         }
     }
 });
+
+function updateSettingUI(item: SettingItem, newValue: SettingValue) {
+    if (!settingsContainer) return;
+
+    const input = settingsContainer.querySelector(
+        `input[data-key="${item.key}"]`
+    ) as HTMLInputElement;
+
+    if (!input) return;
+
+    // Check if value actually differs to avoid cursor jumps or loops (though 'change' event breaks loop)
+    if (item.type === 'switch' && input.checked !== !!newValue) {
+        input.checked = !!newValue;
+    } else if (item.type === 'number' && input.value !== newValue.toString()) {
+        input.value = newValue.toString();
+    }
+}
 
 function showPopupToast(message: string) {
     const toast = document.createElement('div');

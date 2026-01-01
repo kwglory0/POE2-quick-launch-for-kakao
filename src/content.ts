@@ -111,7 +111,7 @@ const DaumLoginHandler: PageHandler = {
                 (nextUrl.pathname.includes('/gamestart/poe.html') ||
                     nextUrl.pathname.includes('/gamestart/poe2.html'))
             );
-        } catch (e) {
+        } catch {
             return false;
         }
     },
@@ -211,7 +211,7 @@ function dispatchPageLogic(settings: AppSettings) {
         return;
     }
 
-    const currentUrl = new URL(window.location.href);
+    const currentUrl = new URL(globalThis.location.href);
     console.log('Dispatching logic for:', currentUrl.href);
     console.log('Referrer:', document.referrer);
 
@@ -256,7 +256,11 @@ function startMainPagePolling(_settings: AppSettings, buttonSelector: string) {
         if (startBtn) {
             // Unconditional Cleanup - BEFORE click
             console.log('[Content] Removing #autoStart from URL (Pre-click)...');
-            history.replaceState(null, '', window.location.pathname + window.location.search);
+            history.replaceState(
+                null,
+                '',
+                globalThis.location.pathname + globalThis.location.search
+            );
 
             console.log(
                 `[Attempt ${attempts}] Found Start Button (${buttonSelector}), clicking...`
@@ -345,7 +349,7 @@ function performLauncherPageLogic(settings: AppSettings) {
             console.log('Launcher Button Clicked. Logic continues...');
 
             // Fallback Logic (Only if it was an auto-start attempt)
-            if (window.location.hash.includes('#autoStart') || settings.isTutorialMode) {
+            if (globalThis.location.hash.includes('#autoStart') || settings.isTutorialMode) {
                 setTimeout(() => {
                     console.log('Fallback Timer Triggered: User still on page?');
                     showTutorialToast(
@@ -493,8 +497,5 @@ function manageIntroModal(preferTodayClose: boolean) {
 }
 
 // Entry Point
-loadSettings().then((settings) => {
-    dispatchPageLogic(settings);
-});
-
-export {};
+const settings = await loadSettings();
+dispatchPageLogic(settings);

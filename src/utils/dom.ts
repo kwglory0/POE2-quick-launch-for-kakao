@@ -9,7 +9,7 @@ export function safeClick(element: HTMLElement) {
         element.href.toLowerCase().startsWith('javascript:')
     ) {
         const event = new MouseEvent('click', {
-            view: window,
+            view: globalThis as unknown as Window,
             bubbles: true,
             cancelable: true
         });
@@ -24,7 +24,7 @@ export function safeClick(element: HTMLElement) {
     }
 
     const event = new MouseEvent('click', {
-        view: window,
+        view: globalThis as unknown as Window,
         bubbles: true,
         cancelable: true
     });

@@ -1,15 +1,6 @@
 // Message types
 console.log('!!! Background Service Worker Initialized !!!');
 
-// Allow Content Scripts to access chrome.storage.session
-if (chrome.storage.session && chrome.storage.session.setAccessLevel) {
-    try {
-        chrome.storage.session.setAccessLevel({ accessLevel: 'TRUSTED_AND_UNTRUSTED_CONTEXTS' });
-    } catch (error) {
-        console.warn('Failed to set access level for session storage:', error);
-    }
-}
-
 // -----------------------------------------------------------------------------
 // Install / Update Handler
 // -----------------------------------------------------------------------------
@@ -49,13 +40,13 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
     console.log('Background received message:', request, 'from sender:', sender);
 
     if (request.action === 'closeTab') {
-        if (sender.tab && sender.tab.id) {
+        if (sender.tab?.id) {
             chrome.tabs.remove(sender.tab.id);
         }
     }
 
     if (request.action === 'registerMainTab') {
-        if (sender.tab && sender.tab.id) {
+        if (sender.tab?.id) {
             chrome.storage.session.set({ mainGameTabId: sender.tab.id });
             console.log('[Background] Registered Main Game Tab ID:', sender.tab.id);
         }
@@ -93,6 +84,5 @@ chrome.runtime.onMessage.addListener((request: MessageRequest, sender, sendRespo
         const val = request.value;
         console.log('[Background] Setting Auto Sequence flag to:', val);
         chrome.storage.session.set({ isAutoSequence: val });
-        sendResponse('ok');
     }
 });

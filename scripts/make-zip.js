@@ -1,7 +1,7 @@
-import { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import { createRequire } from 'module';
+import { exec } from 'node:child_process';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 const packageJson = require('../package.json');
