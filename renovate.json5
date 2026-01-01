@@ -6,7 +6,7 @@
         'helpers:pinGitHubActionDigestsToSemver'
     ],
     timezone: 'Asia/Seoul',
-    schedule: ['at any time on the first day of the week'],
+    schedule: ['every monday'],
     packageRules: [
         {
             matchUpdateTypes: ['minor', 'patch'],
